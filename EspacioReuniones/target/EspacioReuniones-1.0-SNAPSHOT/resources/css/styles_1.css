@@ -1,0 +1,28 @@
+body {
+    display: block;
+    justify-content: center;
+    align-items: flex-start;
+    height: auto;
+    margin: 0;
+}
+
+.logo {
+    width: 100%;   /* Ocupar el 100% del contenedor */
+    max-width: 120px !important; /* Reducir el tamaño máximo del logo */
+    height: auto;   /* Mantener proporción */
+    display: block; /* Asegurarse de que sea un bloque */
+    margin: 0 auto; /* Centrar la imagen */
+}
+
+.app-name {
+    text-align: center;
+    font-size: 40px;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 30px;
+}
+
+/* Corregir el contenedor para que no se desborde */
+.container.mt-4 {
+    margin-bottom: 40px;
+}
