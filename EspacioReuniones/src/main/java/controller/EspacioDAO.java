@@ -29,8 +29,10 @@ public class EspacioDAO {
                 espacio.setId(rs.getInt("id"));
                 espacio.setNombre(rs.getString("nombre"));
                 espacio.setCapacidad(rs.getInt("capacidad"));
-                espacio.setEstado(rs.getString("estado"));
+                espacio.setDescripcion(rs.getString("descripcion"));
+                espacio.setUbicacionId(rs.getInt("ubicacion_id"));
                 espacio.setSeccionId(rs.getInt("seccion_id"));
+                espacio.setEstado(rs.getString("estado"));
                 
                 lista.add(espacio);
             }
@@ -43,13 +45,15 @@ public class EspacioDAO {
 
     // Método para agregar un nuevo espacio
     public boolean agregarEspacio(Espacio espacio) {
-        String sql = "INSERT INTO espacios (nombre, capacidad, estado, seccion_id) VALUES (?, ?, ?, ?)"; 
+        String sql = "INSERT INTO espacios (nombre, capacidad, descripcion, seccion_id, ubicacion_id, estado) VALUES (?, ?, ?, ?, ?, ?)"; 
         try {
             PreparedStatement ps = con.conectar().prepareStatement(sql);
             ps.setString(1, espacio.getNombre());
             ps.setInt(2, espacio.getCapacidad());
-            ps.setString(3, espacio.getEstado());
+            ps.setString(3, espacio.getDescripcion());
             ps.setInt(4, espacio.getSeccionId());
+            ps.setInt(5, espacio.getUbicacionId());
+            ps.setString(6, espacio.getEstado());
             
             ps.executeUpdate();
             return true;
@@ -58,17 +62,42 @@ public class EspacioDAO {
         }
         return false;
     }
+    
+    public Espacio obtenerEspacioPorId(int id) {
+        Espacio espacio = null;
+        String sql = "SELECT * FROM espacios WHERE id = ?";
+        try {
+            PreparedStatement ps = con.conectar().prepareStatement(sql);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                espacio = new Espacio();
+                espacio.setId(rs.getInt("id"));
+                espacio.setNombre(rs.getString("nombre"));
+                espacio.setCapacidad(rs.getInt("capacidad"));
+                espacio.setDescripcion(rs.getString("descripcion"));
+                espacio.setSeccionId(rs.getInt("seccion_id"));
+                espacio.setUbicacionId(rs.getInt("ubicacion_id"));
+                espacio.setEstado(rs.getString("estado"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return espacio;
+    }
 
     // Método para actualizar un espacio existente
     public boolean actualizarEspacio(Espacio espacio) {
-        String sql = "UPDATE espacios SET nombre=?, capacidad=?, estado=?, seccion_id=? WHERE id=?"; 
+        String sql = "UPDATE espacios SET nombre=?, capacidad=?, descripcion=?, seccion_id=?, ubicacion_id=?, estado=? WHERE id=?"; 
         try {
             PreparedStatement ps = con.conectar().prepareStatement(sql);
             ps.setString(1, espacio.getNombre());
             ps.setInt(2, espacio.getCapacidad());
-            ps.setString(3, espacio.getEstado());
+            ps.setString(3, espacio.getDescripcion());
             ps.setInt(4, espacio.getSeccionId());
-            ps.setInt(5, espacio.getId());
+            ps.setInt(5, espacio.getUbicacionId());
+            ps.setString(6, espacio.getEstado());
+            ps.setInt(7, espacio.getId());
             
             ps.executeUpdate();
             return true;

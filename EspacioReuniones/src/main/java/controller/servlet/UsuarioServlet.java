@@ -1,94 +1,187 @@
 package controller.servlet;
 
 import com.mycompany.EspacioReuniones.resources.PasswordUtil;
-import controller.UsuarioDAO;
-import model.Usuario;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import model.Usuario;
+import controller.UsuarioDAO;
+import jakarta.servlet.http.HttpSession;
 
 public class UsuarioServlet extends HttpServlet {
-    private UsuarioDAO usuarioDAO;
-
-    @Override
-    public void init() {
-        usuarioDAO = new UsuarioDAO();
-    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    // Método para manejar tanto GET como POST
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
+
+        // Obtener la sesión actual
+        HttpSession session = request.getSession();
+        Integer usuarioId = (Integer) session.getAttribute("usuarioId");
+        
+        // Verificar si el usuario está autenticado
+        if (usuarioId == null && "listar".equals(action)) {
+            // Si no está autenticado y se intenta reservar, redirigir al login
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        if (usuarioId == null && "nuevo".equals(action)) {
+            // Si no está autenticado y se intenta reservar, redirigir al login
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        if (usuarioId == null && "guardar".equals(action)) {
+            // Si no está autenticado y se intenta reservar, redirigir al login
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        if (usuarioId == null && "editar".equals(action)) {
+            // Si no está autenticado y se intenta reservar, redirigir al login
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        if (usuarioId == null && "actualizar".equals(action)) {
+            // Si no está autenticado y se intenta reservar, redirigir al login
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        if (usuarioId == null && "eliminar".equals(action)) {
+            // Si no está autenticado y se intenta reservar, redirigir al login
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        if (action == null) {
+            action = "listar";
+        }
+
         switch (action) {
+            case "login":
+                login(request, response);
+                break;
+            case "logout":
+                logout(request, response);
+                break;
             case "listar":
                 listarUsuarios(request, response);
                 break;
             case "nuevo":
-                mostrarFormularioNuevo(request, response);
+                agregarUsuario(request, response);
+                break;
+            case "guardar":
+                guardarUsuario(request, response);
                 break;
             case "editar":
-                mostrarFormularioEditar(request, response);
+                obtenerUsuario(request, response);
+                break;
+            case "actualizar":
+                actualizarUsuario(request, response);
                 break;
             case "eliminar":
-                eliminarUsuario(request, response); // Llama al método que maneja la eliminación
+                eliminarUsuario(request, response);
                 break;
             default:
                 listarUsuarios(request, response);
                 break;
         }
     }
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
-        if (action == null) {
-            action = "listar"; // Acción predeterminada si no se proporciona ninguna
-        }
 
-        switch (action) {
-            case "crear":
-                crearUsuario(request, response); // Método para manejar la creación de un nuevo usuario
-                break;
-            case "actualizar":
-                actualizarUsuario(request, response); // Llama al método que maneja la actualización
-                break;
-            case "login":
-                loginUsuario(request, response); // Maneja la lógica de inicio de sesión aquí
-                break;
-            default:
-                listarUsuarios(request, response); // Redirige a la lista si la acción no coincide
-                break;
-        }
-    }
-
-    private void listarUsuarios(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void listaUsuarios(HttpServletRequest request) {
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
         List<Usuario> usuarios = usuarioDAO.listarUsuarios();
-        System.out.println("Número de usuarios obtenidos: " + usuarios.size());
         request.setAttribute("usuarios", usuarios);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("view/usuarios.jsp");
-        dispatcher.forward(request, response);
+    }
+    
+    private void listarUsuarios(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        listaUsuarios(request);
+
+        request.setAttribute("pageContent", "/view/usuarios.jsp");
+        request.getRequestDispatcher("/view/main.jsp").forward(request, response);
     }
 
-    private void mostrarFormularioNuevo(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("view/usuario-new.jsp");
-        dispatcher.forward(request, response);
-    }
+    private void agregarUsuario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        listaUsuarios(request);
 
-    private void mostrarFormularioEditar(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setAttribute("guardar", 1);
+        request.setAttribute("pageContent", "/view/usuario-nuevo.jsp");
+        request.getRequestDispatcher("/view/main.jsp").forward(request, response);
+    }
+    
+    private void guardarUsuario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String nombres = request.getParameter("txtNombres");
+        String apellidos = request.getParameter("txtApellidos");
+        String dni = request.getParameter("txtDni");
+        String codigoAlumno = request.getParameter("txtCodigoAlumno");
+        String email = request.getParameter("txtEmail");
+        String password = request.getParameter("txtPassword");
+        String rol = request.getParameter("txtRol");
+        String ubicacionId = request.getParameter("txtUbicacionId");
+        
+        int ubicacion = Integer.parseInt(ubicacionId);
+        
+        String passEncrypt = PasswordUtil.hashPassword(password);
+
+        Usuario usuario = new Usuario();
+        usuario.setNombres(nombres);
+        usuario.setApellidos(apellidos);
+        usuario.setDni(dni);
+        usuario.setCodigoAlumno(codigoAlumno);
+        usuario.setEmail(email);
+        usuario.setPassword(passEncrypt);
+        usuario.setRol(rol);
+        usuario.setUbicacionId(ubicacion);
+
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        if (usuarioDAO.agregarUsuario(usuario)) {
+            response.sendRedirect("UsuarioServlet?action=listar");
+        } else {
+            response.sendRedirect("UsuarioServlet?action=nuevo");
+        }
+    }
+    
+    private void obtenerUsuario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        listaUsuarios(request);
+
         int id = Integer.parseInt(request.getParameter("id"));
-        Usuario usuario = usuarioDAO.obtenerUsuarioPorId(id); // Método para obtener un usuario por su ID
+       
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        Usuario usuario = usuarioDAO.obtenerUsuarioPorId(id);
         request.setAttribute("usuario", usuario);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("view/usuario-edit.jsp");
-        dispatcher.forward(request, response);
+
+        request.setAttribute("pageContent", "/view/usuario-nuevo.jsp");
+        request.getRequestDispatcher("/view/main.jsp").forward(request, response);
     }
+
     private void actualizarUsuario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-        String nombres = request.getParameter("nombres");
-        String apellidos = request.getParameter("apellidos");
-        String dni = request.getParameter("dni");
-        String codigoAlumno = request.getParameter("codigoAlumno");
-        String email = request.getParameter("email");
-        String rol = request.getParameter("rol");
-        int ubicacionId = Integer.parseInt(request.getParameter("ubicacionId"));
+
+        String nombres = request.getParameter("txtNombres");
+        String apellidos = request.getParameter("txtApellidos");
+        String dni = request.getParameter("txtDni");
+        String codigoAlumno = request.getParameter("txtCodigoAlumno");
+        String email = request.getParameter("txtEmail");
+        String password = request.getParameter("txtPassword");
+        String rol = request.getParameter("txtRol");
+        String ubicacionId = request.getParameter("txtUbicacionId");
+        
+        int ubicacion = Integer.parseInt(ubicacionId);
 
         Usuario usuario = new Usuario();
         usuario.setId(id);
@@ -97,78 +190,59 @@ public class UsuarioServlet extends HttpServlet {
         usuario.setDni(dni);
         usuario.setCodigoAlumno(codigoAlumno);
         usuario.setEmail(email);
-        usuario.setRol(rol);
-        usuario.setUbicacionId(ubicacionId);
-
-        boolean actualizado = usuarioDAO.actualizarUsuario(usuario);
-
-        if (actualizado) {
-            response.sendRedirect("UsuarioServlet?action=listar"); // Redirige a la lista de usuarios tras la actualización
-        } else {
-            request.setAttribute("error", "No se pudo actualizar el usuario");
-            mostrarFormularioEditar(request, response); // Muestra nuevamente el formulario si falla
-        }
-    }
-    private void crearUsuario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String nombres = request.getParameter("nombres");
-        String apellidos = request.getParameter("apellidos");
-        String dni = request.getParameter("dni");
-        String codigoAlumno = request.getParameter("codigoAlumno");
-        String email = request.getParameter("email");
-        String passwordNoEncrypt = request.getParameter("password");
-        String rol = request.getParameter("rol");
-        int ubicacionId = Integer.parseInt(request.getParameter("ubicacionId"));
-
-        //Encriptar
-        String password = PasswordUtil.hashPassword(passwordNoEncrypt);
-        
-        Usuario usuario = new Usuario();
-        usuario.setNombres(nombres);
-        usuario.setApellidos(apellidos);
-        usuario.setDni(dni);
-        usuario.setCodigoAlumno(codigoAlumno);
-        usuario.setEmail(email);
         usuario.setPassword(password);
         usuario.setRol(rol);
-        usuario.setUbicacionId(ubicacionId);
+        usuario.setUbicacionId(ubicacion);
 
-        boolean creado = usuarioDAO.crearUsuario(usuario);
-
-        if (creado) {
-            response.sendRedirect("UsuarioServlet?action=listar"); // Redirige a la lista después de crear
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        if (usuarioDAO.actualizarUsuario(usuario)) {
+            response.sendRedirect("UsuarioServlet?action=listar");
         } else {
-            request.setAttribute("error", "No se pudo registrar el usuario");
-            RequestDispatcher dispatcher = request.getRequestDispatcher("view/nuevo-usuario.jsp");
-            dispatcher.forward(request, response); // Muestra el formulario de nuevo si falla
+            response.sendRedirect("UsuarioServlet?action=editar&id=" + id);
         }
     }
+
     private void eliminarUsuario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int id = Integer.parseInt(request.getParameter("id")); // Obtiene el ID del usuario a eliminar
-        boolean eliminado = usuarioDAO.eliminarUsuario(id);
+        int id = Integer.parseInt(request.getParameter("id"));
 
-        if (eliminado) {
-            response.sendRedirect("UsuarioServlet?action=listar"); // Redirige a la lista de usuarios tras la eliminación
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        if (usuarioDAO.eliminarUsuario(id)) {
+            response.sendRedirect("UsuarioServlet?action=listar");
         } else {
-            request.setAttribute("error", "No se pudo eliminar el usuario");
-            listarUsuarios(request, response); // Vuelve a mostrar la lista si falla
+            response.sendRedirect("UsuarioServlet?action=eliminar&id=" + id);
         }
     }
-    private void loginUsuario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String email = request.getParameter("usuario"); // Asumiendo que 'usuario' se refiere al correo
+
+    private void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String email = request.getParameter("usuario");
         String password = request.getParameter("password");
 
-        // Llama al DAO para verificar las credenciales
-        boolean autenticado = usuarioDAO.verificarCredenciales(email, password);
-        
-        if (autenticado) {
-            // Redirige a la lista de usuarios si la autenticación es correcta
-            RequestDispatcher dispatcher = request.getRequestDispatcher("view/main.jsp");
-            dispatcher.forward(request, response);
-        } else {
-            // Si falla, redirige nuevamente al login con un mensaje de error
-            request.setAttribute("error", "Correo o contraseña incorrectos.");
-            RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
-            dispatcher.forward(request, response);
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        boolean isValidUser = usuarioDAO.verificarCredenciales(email, password);
+
+        if (isValidUser) {
+            // Obtener el usuario completo para acceder a su ID
+            Usuario usuario = usuarioDAO.obtenerUsuarioPorEmail(email);
+
+            // Iniciar la sesión y guardar el ID del usuario
+            HttpSession session = request.getSession();
+            session.setAttribute("usuarioId", usuario.getId());
+            response.sendRedirect("InicioServlet?action=inicio");
+
+        }
+         else {
+            // Si las credenciales no son válidas, mostrar un mensaje de error
+            request.setAttribute("error", "Correo electrónico o contraseña incorrectos.");
+        response.sendRedirect("index.jsp");
         }
     }
+    
+    private void logout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        response.sendRedirect("index.jsp");
+    }
+   
 }

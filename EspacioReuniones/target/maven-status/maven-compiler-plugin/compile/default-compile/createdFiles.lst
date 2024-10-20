@@ -11,12 +11,15 @@ model\Ubicacion.class
 controller\servlet\InicioServlet.class
 controller\EspacioCaracteristicaDAO.class
 controller\SeccionDAO.class
+controller\servlet\EspacioServlet.class
 controller\UsuarioDAO.class
 controller\UbicacionDAO.class
 model\Seccion.class
 com\mycompany\EspacioReuniones\resources\JakartaEE10Resource.class
 controller\servlet\UbicacionServlet.class
 com\mycompany\EspacioReuniones\resources\PasswordUtil.class
+controller\servlet\SeccionServlet.class
 model\Caracteristica.class
 controller\DbConexion.class
 controller\servlet\UsuarioServlet.class
+controller\servlet\ReservaServlet.class

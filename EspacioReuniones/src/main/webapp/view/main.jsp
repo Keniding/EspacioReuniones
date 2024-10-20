@@ -26,12 +26,12 @@
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item"><a class="nav-link" href="InicioServlet?action=inicio">Inicio</a></li>
                 <li class="nav-item"><a class="nav-link" href="UbicacionServlet?action=listar">Ubicaciones</a></li>               
-                <li class="nav-item"><a class="nav-link" href="MainServlet?action=secciones">Secciones</a></li>
-                <li class="nav-item"><a class="nav-link" href="MainServlet?action=espacios">Espacios</a></li>
-                <li class="nav-item"><a class="nav-link" href="MainServlet?action=usuarios">Usuarios</a></li>
+                <li class="nav-item"><a class="nav-link" href="SeccionServlet?action=listar">Secciones</a></li>
+                <li class="nav-item"><a class="nav-link" href="EspacioServlet?action=listar">Espacios</a></li>
+                <li class="nav-item"><a class="nav-link" href="UsuarioServlet?action=listar">Usuarios</a></li>
                 <li class="nav-item"><a class="nav-link" href="MainServlet?action=reservar">Reservar Espacio</a></li>
-                <li class="nav-item"><a class="nav-link" href="MainServlet?action=misreservas">Mis Reservas</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Cerrar Sesión</a></li>
+                <li class="nav-item"><a class="nav-link" href="ReservaServlet?action=listar">Mis Reservas</a></li>
+                <li class="nav-item"><a class="nav-link" href="UsuarioServlet?action=logout">Cerrar Sesión</a></li>
             </ul>
         </div>
     </nav>
@@ -42,35 +42,6 @@
         <jsp:include page="${pageContent}" />
     </div>
     
-        <div class="container mt-5">
-        <h1 class="text-center">Reserva de Sala de Reuniones</h1>
-        <form id="reservation-form">
-            <div class="form-group">
-                <label for="meeting-room">Sala de Reuniones</label>
-                <select class="form-control" id="meeting-room" required>
-                    <option value="">Selecciona una sala</option>
-                    <option value="Sala 1">Sala Ejecutiva</option>
-                    <option value="Sala 2">Sala de Capacitación</option>
-                    <option value="Sala 3">Sala de Conferencias</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="date">Fecha</label>
-                <input type="date" class="form-control" id="date" required>
-            </div>
-            <div class="form-group">
-                <label for="time">Hora</label>
-                <input type="time" class="form-control" id="time" required>
-            </div>
-            <div class="form-group">
-                <label for="name">Nombre del Solicitante</label>
-                <input type="text" class="form-control" id="name" placeholder="Tu nombre" required>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">Reservar</button>
-        </form>
-        <div id="reservation-result" class="mt-4"></div>
-    </div>
-
     <!-- Footer -->
     <footer class="bg-light text-center text-lg-start mt-4">
         <div class="text-center p-3">
