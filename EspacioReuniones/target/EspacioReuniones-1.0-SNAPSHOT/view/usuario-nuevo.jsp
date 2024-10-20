@@ -63,6 +63,12 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
+                                    <label>Password</label>
+                                    <input type="email" name="txtPassword" id="txtPassword" value="${usuario.password}" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
                                     <label>Ubicación ID</label>
                                     <input type="text" name="txtUbicacionId" id="txtUbicacionId" value="${usuario.ubicacionId}" class="form-control" disabled>
                                 </div>
@@ -168,6 +174,7 @@
                 document.getElementById("txtEmail").disabled = true;
                 document.getElementById("txtRol").disabled = true;
                 document.getElementById("txtUbicacionId").disabled = true;
+                document.getElementById("txtPassword").disabled = true;
             };
             document.getElementById("btna").onclick = function () {
                 document.getElementById("btnc").disabled = false;
@@ -181,6 +188,7 @@
                 document.getElementById("txtEmail").disabled = false;
                 document.getElementById("txtRol").disabled = false;
                 document.getElementById("txtUbicacionId").disabled = false;
+                document.getElementById("txtPassword").disabled = false;
                 document.getElementById("txtNombres").focus();
                 document.getElementById("txtNombres").value = "";
                 document.getElementById("txtApellidos").value = "";
@@ -189,6 +197,7 @@
                 document.getElementById("txtEmail").value = "";
                 document.getElementById("txtRol").value = "";
                 document.getElementById("txtUbicacionId").value = "";
+                document.getElementById("txtPassword").value = "";
             };
             document.getElementById("btnm").onclick = function () {
                 document.getElementById("btnc").disabled = false;
@@ -202,6 +211,7 @@
                 document.getElementById("txtEmail").disabled = false;
                 document.getElementById("txtRol").disabled = false;
                 document.getElementById("txtUbicacionId").disabled = false;
+                document.getElementById("txtPassword").disabled = false;
                 document.getElementById("txtNombres").focus();
             };
             if ($('#txtNombres').val().length !== 0) {
@@ -216,6 +226,7 @@
                 document.getElementById("txtEmail").disabled = false;
                 document.getElementById("txtRol").disabled = false;
                 document.getElementById("txtUbicacionId").disabled = false;
+                document.getElementById("txtPassword").disabled = false;
                 document.getElementById("btnac").disabled = true;
                 document.getElementById("btna").disabled = true;
                 document.getElementById("btng").disabled = false;
@@ -231,6 +242,7 @@
                 document.getElementById("txtEmail").disabled = false;
                 document.getElementById("txtRol").disabled = false;
                 document.getElementById("txtUbicacionId").disabled = false;
+                document.getElementById("txtPassword").disabled = false;
                 document.getElementById("btnac").disabled = false;
                 document.getElementById("btna").disabled = true;
                 document.getElementById("btng").disabled = true;
@@ -254,6 +266,7 @@
                 document.getElementById("txtEmail").disabled = true;
                 document.getElementById("txtRol").disabled = true;
                 document.getElementById("txtUbicacionId").disabled = true;
+                document.getElementById("txtPassword").disabled = true;
             };
             
             document.getElementById("btng").onclick = function () {

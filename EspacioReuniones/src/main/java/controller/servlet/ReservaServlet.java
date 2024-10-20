@@ -100,7 +100,9 @@ public class ReservaServlet extends HttpServlet {
 
     private void listarReservas(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ReservaDAO reservaDAO = new ReservaDAO();
-        List<Reserva> reservas = reservaDAO.listarReservas();
+        HttpSession session = request.getSession();
+        Integer usuarioId = (Integer) session.getAttribute("usuarioId");
+        List<Reserva> reservas = reservaDAO.listarReservas(usuarioId);
         request.setAttribute("reservas", reservas);
 
         request.setAttribute("pageContent", "/view/reservas.jsp");
@@ -109,7 +111,9 @@ public class ReservaServlet extends HttpServlet {
 
     private void agregarReserva(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ReservaDAO reservaDAO = new ReservaDAO();
-        List<Reserva> reservas = reservaDAO.listarReservas();
+        HttpSession session = request.getSession();
+        Integer usuarioId = (Integer) session.getAttribute("usuarioId");
+        List<Reserva> reservas = reservaDAO.listarReservas(usuarioId);
         request.setAttribute("reservas", reservas);
 
         request.setAttribute("pageContent", "/view/reserva-nuevo.jsp");
@@ -143,7 +147,9 @@ public class ReservaServlet extends HttpServlet {
 
     private void obtenerReserva(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ReservaDAO reservaDAO = new ReservaDAO();
-        List<Reserva> reservas = reservaDAO.listarReservas();
+        HttpSession session = request.getSession();
+        Integer usuarioId = (Integer) session.getAttribute("usuarioId");
+        List<Reserva> reservas = reservaDAO.listarReservas(usuarioId);
         request.setAttribute("reservas", reservas);
         
         int id = Integer.parseInt(request.getParameter("id"));

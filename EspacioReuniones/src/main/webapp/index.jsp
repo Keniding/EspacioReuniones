@@ -42,7 +42,7 @@
 
         <!-- Botón para Registrar Usuario -->
         <form action="UsuarioServlet" method="get" class="mt-3">
-            <input type="hidden" name="action" value="nuevo">
+            <input type="hidden" name="action" value="new">
             <button type="submit" class="btn btn-secondary w-100">Registrar Usuario</button>
         </form>
 

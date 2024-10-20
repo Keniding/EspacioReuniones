@@ -79,6 +79,10 @@ public class UsuarioServlet extends HttpServlet {
             case "logout":
                 logout(request, response);
                 break;
+            case "new":
+                crear(request, response);
+            case "crear":
+                guardar(request, response);
             case "listar":
                 listarUsuarios(request, response);
                 break;
@@ -178,6 +182,7 @@ public class UsuarioServlet extends HttpServlet {
         String codigoAlumno = request.getParameter("txtCodigoAlumno");
         String email = request.getParameter("txtEmail");
         String password = request.getParameter("txtPassword");
+        String pass = PasswordUtil.hashPassword(password);
         String rol = request.getParameter("txtRol");
         String ubicacionId = request.getParameter("txtUbicacionId");
         
@@ -190,7 +195,7 @@ public class UsuarioServlet extends HttpServlet {
         usuario.setDni(dni);
         usuario.setCodigoAlumno(codigoAlumno);
         usuario.setEmail(email);
-        usuario.setPassword(password);
+        usuario.setPassword(pass);
         usuario.setRol(rol);
         usuario.setUbicacionId(ubicacion);
 
@@ -243,6 +248,53 @@ public class UsuarioServlet extends HttpServlet {
             session.invalidate();
         }
         response.sendRedirect("index.jsp");
+    }
+
+    private void crear(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        listaUsuarios(request);
+
+        request.setAttribute("guardar", 1);
+        request.setAttribute("pageContent", "/view/usuario-new.jsp");
+        request.getRequestDispatcher("/view/main.jsp").forward(request, response);
+    }
+
+    private void guardar(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String nombres = request.getParameter("txtNombres");
+        String apellidos = request.getParameter("txtApellidos");
+        String dni = request.getParameter("txtDni");
+        String codigoAlumno = request.getParameter("txtCodigoAlumno");
+        String email = request.getParameter("txtEmail");
+        String password = request.getParameter("txtPassword");
+        String rol = request.getParameter("txtRol");
+        String ubicacionId = request.getParameter("txtUbicacionId");
+        
+        int ubicacion = Integer.parseInt(ubicacionId);
+        
+        String passEncrypt = PasswordUtil.hashPassword(password);
+
+        Usuario usuario = new Usuario();
+        usuario.setNombres(nombres);
+        usuario.setApellidos(apellidos);
+        usuario.setDni(dni);
+        usuario.setCodigoAlumno(codigoAlumno);
+        usuario.setEmail(email);
+        usuario.setPassword(passEncrypt);
+        usuario.setRol(rol);
+        usuario.setUbicacionId(ubicacion);
+
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        if (usuarioDAO.agregarUsuario(usuario)) {
+            // Obtener el usuario completo para acceder a su ID
+            Usuario user;
+            user = usuarioDAO.obtenerUsuarioPorEmail(email);
+
+            // Iniciar la sesión y guardar el ID del usuario
+            HttpSession session = request.getSession();
+            session.setAttribute("usuarioId", user.getId());
+            //response.sendRedirect("InicioServlet?action=inicio");
+        } else {
+            //response.sendRedirect("UsuarioServlet?action=nuevo");
+        }
     }
    
 }

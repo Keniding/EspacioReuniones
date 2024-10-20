@@ -68,7 +68,7 @@ public class UsuarioDAO {
 
     // Método para actualizar un usuario existente
     public boolean actualizarUsuario(Usuario usuario) {
-        String sql = "UPDATE usuario SET nombres=?, apellidos=?, dni=?, codigo_alumno=?, email=?, rol=?, ubicacion_id=? WHERE id=?";
+        String sql = "UPDATE usuario SET nombres=?, apellidos=?, dni=?, codigo_alumno=?, email=?, password = ?, rol=?, ubicacion_id=? WHERE id=?";
         try {
             PreparedStatement ps = con.conectar().prepareStatement(sql);
             ps.setString(1, usuario.getNombres());
@@ -76,9 +76,10 @@ public class UsuarioDAO {
             ps.setString(3, usuario.getDni());
             ps.setString(4, usuario.getCodigoAlumno());
             ps.setString(5, usuario.getEmail());
-            ps.setString(6, usuario.getRol());
-            ps.setInt(7, usuario.getUbicacionId());
-            ps.setInt(8, usuario.getId());
+            ps.setString(6, usuario.getPassword());
+            ps.setString(7, usuario.getRol());
+            ps.setInt(8, usuario.getUbicacionId());
+            ps.setInt(9, usuario.getId());
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {

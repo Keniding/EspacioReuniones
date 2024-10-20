@@ -17,12 +17,13 @@ public class ReservaDAO {
         con = new DbConexion();
     }
 
-    // Método para listar todas las reservas
-    public List<Reserva> listarReservas() {
+    // Método para listar todas las reservas de un usuario específico
+    public List<Reserva> listarReservas(int usuarioId) {
         List<Reserva> lista = new ArrayList<>();
-        String sql = "SELECT * FROM reservas"; 
+        String sql = "SELECT * FROM reservas WHERE usuario_id = ?"; 
         try {
             PreparedStatement ps = con.conectar().prepareStatement(sql);
+            ps.setInt(1, usuarioId); // Establecer el valor del parámetro usuario_id
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Reserva reserva = new Reserva();
@@ -33,15 +34,16 @@ public class ReservaDAO {
                 reserva.setUsuarioId(rs.getInt("usuario_id"));
                 reserva.setEspacioId(rs.getInt("espacio_id"));
                 reserva.setEstado(rs.getString("estado"));
-                
+
                 lista.add(reserva);
             }
-            System.out.println("Reservas cargadas: " + lista.size());
+            System.out.println("Reservas cargadas para el usuario " + usuarioId + ": " + lista.size());
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return lista;
     }
+
 
     // Método para agregar una nueva reserva
     public boolean agregarReserva(Reserva reserva) {
