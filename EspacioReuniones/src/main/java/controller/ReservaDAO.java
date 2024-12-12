@@ -17,7 +17,6 @@ public class ReservaDAO {
         con = new DbConexion();
     }
 
-   // Método para listar todas las reservas de un usuario específico
     public List<Reserva> listarReservas(int usuarioId) {
         List<Reserva> lista = new ArrayList<>();
         String sql = "SELECT * FROM reservas WHERE usuario_id = ?"; 
@@ -43,6 +42,7 @@ public class ReservaDAO {
         }
         return lista;
     }
+    
     // Método para agregar una nueva reserva
     public boolean agregarReserva(Reserva reserva) {
         String sql = "INSERT INTO reservas (usuario_id, espacio_id, fecha, hora_inicio, hora_fin, estado) VALUES (?, ?, ?, ?, ?, ?)"; 

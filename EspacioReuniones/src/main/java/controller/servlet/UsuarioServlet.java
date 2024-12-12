@@ -184,6 +184,7 @@ public class UsuarioServlet extends HttpServlet {
             response.sendRedirect("UsuarioServlet?action=eliminar&id=" + id);
         }
     }
+
     private void actualizarUsuario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
 
@@ -217,6 +218,18 @@ public class UsuarioServlet extends HttpServlet {
             response.sendRedirect("UsuarioServlet?action=editar&id=" + id);
         }
     }
+
+    private void eliminarUsuario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        if (usuarioDAO.eliminarUsuario(id)) {
+            response.sendRedirect("UsuarioServlet?action=listar");
+        } else {
+            response.sendRedirect("UsuarioServlet?action=eliminar&id=" + id);
+        }
+    }
+
     private void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("usuario");
         String password = request.getParameter("password");
@@ -295,5 +308,4 @@ public class UsuarioServlet extends HttpServlet {
             //response.sendRedirect("UsuarioServlet?action=nuevo");
         }
     }
-   
 }
