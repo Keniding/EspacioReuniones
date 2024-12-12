@@ -19,7 +19,7 @@
     <div class="container mt-4">
         <!-- Logo de la aplicación -->
         <div class="text-center">
-            <img src="resources/images/icon.png" alt="Logo" class="logo">
+            <img src="resources/images/logo_1.png" alt="Logo" class="logo">
         </div>
         <!-- Nombre de la aplicación -->
         <div class="app-name">Space Manager</div>
@@ -30,32 +30,32 @@
                 <h2 class="mb-4">Registro de Nuevo Usuario</h2>
                 <form action="UsuarioServlet?action=crear" method="post" class="form">
                     <div class="form-group mb-3">
-                        <label for="nombres">Nombres:</label>
-                        <input type="text" id="nombres" name="nombres" class="form-control" required>
+                        <label for="txtNombres">Nombres:</label>
+                        <input type="text" id="txtNombres" name="txtNombres" class="form-control" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="apellidos">Apellidos:</label>
-                        <input type="text" id="apellidos" name="apellidos" class="form-control" required>
+                        <label for="txtApellidos">Apellidos:</label>
+                        <input type="text" id="txtApellidos" name="txtApellidos" class="form-control" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="dni">DNI:</label>
-                        <input type="text" id="dni" name="dni" class="form-control" required>
+                        <label for="txtDni">DNI:</label>
+                        <input type="text" id="txtDni" name="txtDni" class="form-control" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="codigoAlumno">Código Alumno:</label>
-                        <input type="text" id="codigoAlumno" name="codigoAlumno" class="form-control">
+                        <label for="txtCodigoAlumno">Código Alumno:</label>
+                        <input type="text" id="txtCodigoAlumno" name="txtCodigoAlumno" class="form-control">
                     </div>
                     <div class="form-group mb-3">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" class="form-control" required>
+                        <label for="txtEmail">Email:</label>
+                        <input type="email" id="txtEmail" name="txtEmail" class="form-control" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="password">Password:</label>
-                        <input type="password" id="password" name="password" class="form-control" required>
+                        <label for="txtPassword">Password:</label>
+                        <input type="password" id="txtPassword" name="txtPassword" class="form-control" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="rol">Rol:</label>
-                        <select id="rol" name="rol" class="form-control" required>
+                        <label for="txtRol">Rol:</label>
+                        <select id="txtRol" name="txtRol" class="form-control" required>
                             <option value="Superadministrador">Superadministrador</option>
                             <option value="Coordinador_ubicacion">Coordinador_ubicacion</option>
                             <option value="Administrador_seccion">Administrador_seccion</option>
@@ -65,8 +65,8 @@
                         </select>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="ubicacionId">Ubicación:</label>
-                        <input type="number" id="ubicacionId" name="ubicacionId" class="form-control" required>
+                        <label for="txtUbicacionId">Ubicación:</label>
+                        <input type="number" id="txtUbicacionId" name="txtUbicacionId" class="form-control" required>
                     </div>
                     <input type="submit" value="Registrar" class="btn btn-primary w-100">
                 </form>

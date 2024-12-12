@@ -1,21 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+    <servlet-mapping>
+        <servlet-name>ReservarSalaServlet</servlet-name>
+        <url-pattern>/ReservarSalaServlet</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
-
     <!-- Configuración para UsuarioServlet -->
     <servlet>
         <servlet-name>UsuarioServlet</servlet-name>
         <servlet-class>controller.servlet.UsuarioServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ReservarSalaServlet</servlet-name>
+        <servlet-class>controller.servlet.ReservarSalaServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>UsuarioServlet</servlet-name>
         <url-pattern>/UsuarioServlet</url-pattern>
     </servlet-mapping>
-
     <!-- Configuración para MainServlet -->
     <servlet>
         <servlet-name>MainServlet</servlet-name>
@@ -23,10 +29,11 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>MainServlet</servlet-name>
-        <url-pattern>/MainServlet</url-pattern> <!-- Aquí puedes ajustar la URL según tus necesidades -->
+        <url-pattern>/MainServlet</url-pattern>
+        <!-- Aquí puedes ajustar la URL según tus necesidades -->
     </servlet-mapping>
-   <!-- Configuración para Ubicaciones servlet -->    
-      <servlet>
+    <!-- Configuración para Ubicaciones servlet -->
+    <servlet>
         <servlet-name>UbicacionServlet</servlet-name>
         <servlet-class>controller.servlet.UbicacionServlet</servlet-class>
     </servlet>
@@ -34,13 +41,29 @@
         <servlet-name>UbicacionServlet</servlet-name>
         <url-pattern>/UbicacionServlet</url-pattern>
     </servlet-mapping>
-   <!-- Configuración para Inicio servlet -->    
-      <servlet>
+    <!-- Configuración para Inicio servlet -->
+    <servlet>
         <servlet-name>InicioServlet</servlet-name>
         <servlet-class>controller.servlet.InicioServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>InicioServlet</servlet-name>
         <url-pattern>/InicioServlet</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>EspacioServlet</servlet-name>
+        <servlet-class>controller.servlet.EspacioServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EspacioServlet</servlet-name>
+        <url-pattern>/EspacioServlet</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>ReservaServlet</servlet-name>
+        <servlet-class>controller.servlet.ReservaServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ReservaServlet</servlet-name>
+        <url-pattern>/ReservaServlet</url-pattern>
     </servlet-mapping>
 </web-app>

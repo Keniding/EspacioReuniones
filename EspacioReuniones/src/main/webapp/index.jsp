@@ -19,7 +19,7 @@
 <body>
     <div class="login-container">
         <!-- Logo de la aplicación -->
-        <img src="resources/images/logo 1.png" alt="Logo" class="logo"> 
+        <img src="resources/images/logo_1.png" alt="Logo" class="logo"> 
 
         <!-- Nombre de la aplicación -->
         <div class="app-name">Espacio de Reuniones</div>
@@ -42,7 +42,7 @@
 
         <!-- Botón para Registrar Usuario -->
         <form action="UsuarioServlet" method="get" class="mt-3">
-            <input type="hidden" name="action" value="nuevo">
+            <input type="hidden" name="action" value="new">
             <button type="submit" class="btn btn-secondary w-100">Registrar Usuario</button>
         </form>
 

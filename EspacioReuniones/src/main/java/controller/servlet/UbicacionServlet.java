@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Ubicacion;
 import controller.UbicacionDAO;
+import jakarta.servlet.http.HttpSession;
 
 public class UbicacionServlet extends HttpServlet {
 
@@ -25,6 +26,47 @@ public class UbicacionServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
 
+        // Obtener la sesión actual
+        HttpSession session = request.getSession();
+        Integer usuarioId = (Integer) session.getAttribute("usuarioId");
+        
+        // Verificar si el usuario está autenticado
+        if (usuarioId == null && "listar".equals(action)) {
+            // Si no está autenticado y se intenta reservar, redirigir al login
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        if (usuarioId == null && "nuevo".equals(action)) {
+            // Si no está autenticado y se intenta reservar, redirigir al login
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        if (usuarioId == null && "guardar".equals(action)) {
+            // Si no está autenticado y se intenta reservar, redirigir al login
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        if (usuarioId == null && "editar".equals(action)) {
+            // Si no está autenticado y se intenta reservar, redirigir al login
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        if (usuarioId == null && "actualizar".equals(action)) {
+            // Si no está autenticado y se intenta reservar, redirigir al login
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
+        if (usuarioId == null && "eliminar".equals(action)) {
+            // Si no está autenticado y se intenta reservar, redirigir al login
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
         // Si no se especifica ninguna acción, mostrar la lista de ubicaciones por defecto
         if (action == null) {
             action = "listar";

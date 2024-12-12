@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 
 public class InicioServlet extends HttpServlet {
@@ -12,6 +13,17 @@ public class InicioServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
 
+        // Obtener la sesión actual
+        HttpSession session = request.getSession();
+        Integer usuarioId = (Integer) session.getAttribute("usuarioId");
+        
+        // Verificar si el usuario está autenticado
+        if (usuarioId == null && "inicio".equals(action)) {
+            // Si no está autenticado y se intenta reservar, redirigir al login
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        
         // Si no se especifica ninguna acción, mostrar la lista de ubicaciones por defecto
         if (action == null) {
             action = "inicio";

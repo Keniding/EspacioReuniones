@@ -16,8 +16,10 @@ public class DbConexion {
     Connection con;
     String URL = "jdbc:mysql://localhost:3306/";
     String DB = "bd_reservar_sala";
-    String USER = "root";  // Cambia a tu usuario de MySQL
-    String PASSWORD = ""; // Cambia a tu contraseña de MySQL
+    String USER = "root";
+            //"samuel";  
+    String PASSWORD = "";
+            //"12345";
     String DRIVER = "com.mysql.cj.jdbc.Driver";
 
     public DbConexion(){

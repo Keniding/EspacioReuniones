@@ -28,7 +28,8 @@ public class SeccionDAO {
                 Seccion seccion = new Seccion();
                 seccion.setId(rs.getInt("id"));
                 seccion.setNombre(rs.getString("nombre"));
-                
+                seccion.setUbicacionId(rs.getInt("ubicacion_id")); 
+                seccion.setDescripcion(rs.getString("descripcion")); 
                 lista.add(seccion);
             }
             System.out.println("Secciones cargadas: " + lista.size());
@@ -40,10 +41,12 @@ public class SeccionDAO {
 
     // Método para agregar una nueva sección
     public boolean agregarSeccion(Seccion seccion) {
-        String sql = "INSERT INTO secciones (nombre) VALUES (?)"; 
+        String sql = "INSERT INTO secciones (nombre, ubicacion_id, descripcion) VALUES (?, ?, ?)"; 
         try {
             PreparedStatement ps = con.conectar().prepareStatement(sql);
             ps.setString(1, seccion.getNombre());
+            ps.setInt(2, seccion.getUbicacionId());
+            ps.setString(3, seccion.getDescripcion());
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -51,14 +54,39 @@ public class SeccionDAO {
         }
         return false;
     }
+    
+    public Seccion obtenerSeccionPorId(int id) {
+        Seccion seccion = null;
+        String sql = "SELECT * FROM secciones WHERE Id = ?";
+
+        try (PreparedStatement statement = con.conectar().prepareStatement(sql)) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                seccion = new Seccion();
+                seccion.setId(resultSet.getInt("Id"));
+                seccion.setNombre(resultSet.getString("Nombre"));
+                seccion.setUbicacionId(resultSet.getInt("Ubicacion_id"));
+                seccion.setDescripcion(resultSet.getString("Descripcion"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Manejo de errores adecuado
+        }
+
+        return seccion;
+    }
 
     // Método para actualizar una sección existente
     public boolean actualizarSeccion(Seccion seccion) {
-        String sql = "UPDATE secciones SET nombre=? WHERE id=?"; 
+        String sql = "UPDATE secciones SET nombre=?, ubicacion_id=?, descripcion=? WHERE id=?"; 
         try {
             PreparedStatement ps = con.conectar().prepareStatement(sql);
             ps.setString(1, seccion.getNombre());
-            ps.setInt(2, seccion.getId());
+            ps.setInt(2, seccion.getUbicacionId());
+            ps.setString(3, seccion.getDescripcion());
+            ps.setInt(4, seccion.getId());
 
             ps.executeUpdate();
             return true;

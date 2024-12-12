@@ -25,39 +25,32 @@
     <body>
         <div class="container">
             <!--PARA MOSTRAR E INGRESAR LOS DATOS DE LA RESERVA-->
-            <form action="Controlador?menu=Reserva" method="post">
+            <form action="ReservaServlet?action=guardar" method="post">
                 <h5><i class="fa-solid fa-calendar-check"></i> Datos de la Reserva</h5>
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
+                            <!-- Campo de ID de Usuario eliminado -->
                             <div class="col-sm-4">
                                 <div class="form-group">
-                                    <label>ID Usuario</label>
-                                    <input type="text" name="txtUsuarioId" id="txtUsuarioId" value="${reserva.getUsuarioId()}" class="form-control" disabled>
-                                </div>
-                                <div class="form-group">
                                     <label>ID Espacio</label>
-                                    <input type="text" name="txtEspacioId" id="txtEspacioId" value="${reserva.getEspacioId()}" class="form-control" disabled>
+                                    <input type="text" name="txtespacioId" id="txtEspacioId" value="${reserva.getEspacioId()}" class="form-control">
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label>Fecha</label>
-                                    <input type="date" name="txtFecha" id="txtFecha" value="${reserva.getFecha()}" class="form-control" disabled>
+                                    <input type="date" name="txtfecha" id="txtFecha" value="${reserva.getFecha()}" class="form-control">
                                 </div>
                                 <div class="form-group">
                                     <label>Hora Inicio</label>
-                                    <input type="time" name="txtHoraInicio" id="txtHoraInicio" value="${reserva.getHoraInicio()}" class="form-control" disabled>
+                                    <input type="time" name="txthoraInicio" id="txtHoraInicio" value="${reserva.getHoraInicio()}" class="form-control">
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="form-group">
-                                    <label>Hora Fin</label>
-                                    <input type="time" name="txtHoraFin" id="txtHoraFin" value="${reserva.getHoraFin()}" class="form-control" disabled>
-                                </div>
-                                <div class="form-group">
                                     <label>Estado</label>
-                                    <select class="form-select" name="selEstado" id="selEstado" disabled>
+                                    <select class="form-select" name="selEstado" id="selEstado">
                                         <option value="Pendiente" ${estado.equals("Pendiente") ? "selected" : ""}>Pendiente</option>
                                         <option value="Confirmado" ${estado.equals("Confirmado") ? "selected" : ""}>Confirmado</option>
                                         <option value="Cancelado" ${estado.equals("Cancelado") ? "selected" : ""}>Cancelado</option>
@@ -65,9 +58,7 @@
                                 </div>
                             </div>
                             <div class="form-group mt-4 text-center">
-                                <input type="submit" name="accion" id="btna" value="Agregar" class="btn btn-primary">
-                                <input type="submit" name="accion" id="btng" value="Guardar" class="btn btn-danger" disabled>
-                                <input type="submit" name="accion" id="btnm" value="Modificar" class="btn btn-info" disabled>
+                                <input type="submit" name="accion" id="btnm" value="Modificar" class="btn btn-info">
                                 <input type="submit" name="accion" id="btnac" value="Actualizar" class="btn btn-success" disabled>
                                 <input type="submit" name="accion" id="btnc" value="Cancelar" class="btn btn-warning" disabled>
                             </div>
@@ -80,32 +71,32 @@
             <h5 class="text-center mt-3">Listado de Reservas</h5>
             <div class="card">
                 <div class="card-body">
-                    <table class="table table-hover" id="mi_tabla">
+                    <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th class="text-center">ID</th>
-                                <th class="text-center">Usuario ID</th>
-                                <th class="text-center">Espacio ID</th>
-                                <th class="text-center">Fecha</th>
-                                <th class="text-center">Hora Inicio</th>
-                                <th class="text-center">Hora Fin</th>
-                                <th class="text-center">Estado</th>
-                                <th class="text-center">Acciones</th>
+                                <th>ID</th>
+                                <th>ID Usuario</th>
+                                <th>ID Espacio</th>
+                                <th>Fecha</th>
+                                <th>Hora Inicio</th>
+                                <th>Hora Fin</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <c:forEach var="res" items="${reservas}">
-                                <tr class="text-center">
-                                    <td>${res.getId()}</td>
-                                    <td>${res.getUsuarioId()}</td>
-                                    <td>${res.getEspacioId()}</td>
-                                    <td>${res.getFecha()}</td>
-                                    <td>${res.getHoraInicio()}</td>
-                                    <td>${res.getHoraFin()}</td>
-                                    <td>${res.getEstado()}</td>
+                            <c:forEach var="reserva" items="${reservas}">
+                                <tr>
+                                    <td>${reserva.id}</td>
+                                    <td>${reserva.usuarioId}</td>
+                                    <td>${reserva.espacioId}</td>
+                                    <td>${reserva.fecha}</td>
+                                    <td>${reserva.horaInicio}</td>
+                                    <td>${reserva.horaFin}</td>
+                                    <td>${reserva.estado}</td>
                                     <td>
-                                        <a class="btn btn-warning" id="btned" href="Controlador?menu=Reserva&accion=Editar&id=${res.getId()}"><i class="fa-solid fa-pen-to-square"></i></a>
-                                        <a class="btn btn-danger" href="Controlador?menu=Reserva&accion=Eliminar&id=${res.getId()}"><i class="fa-solid fa-trash-can"></i></a>
+                                        <a href="ReservaServlet?action=editar&id=${reserva.id}" class="btn btn-warning">Editar</a>
+                                        <a href="ReservaServlet?action=eliminar&id=${reserva.id}" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta reserva?');">Eliminar</a>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -126,7 +117,7 @@
 
         <!--De JS-->
         <script type="text/javascript">
-            //Para la actualizacion de la tabla reserva
+            //Para la actualizacion de la tabla de reservas
             $(document).ready(function () {
                 $('#mi_tabla').DataTable({
                     language: {
@@ -140,50 +131,32 @@
                 document.getElementById("btna").disabled = false;
                 document.getElementById("btng").disabled = true;
                 document.getElementById("btnac").disabled = true;
-                document.getElementById("txtUsuarioId").disabled = true;
                 document.getElementById("txtEspacioId").disabled = true;
-                document.getElementById("txtFecha").disabled = true;
                 document.getElementById("txtHoraInicio").disabled = true;
                 document.getElementById("txtHoraFin").disabled = true;
-                document.getElementById("selEstado").disabled = true;
             };
             document.getElementById("btna").onclick = function () {
                 document.getElementById("btnc").disabled = false;
                 document.getElementById("btna").disabled = true;
                 document.getElementById("btnm").disabled = true;
                 document.getElementById("btng").disabled = false;
-                document.getElementById("txtUsuarioId").disabled = false;
-                document.getElementById("txtEspacioId").disabled = false;
-                document.getElementById("txtFecha").disabled = false;
-                document.getElementById("txtHoraInicio").disabled = false;
-                document.getElementById("txtHoraFin").disabled = false;
-                document.getElementById("selEstado").disabled = false;
-                document.getElementById("txtUsuarioId").focus();
-                document.getElementById("txtUsuarioId").value = "";
+                document.getElementById("txtEspacioId").disabled = true;
+                document.getElementById("txtHoraInicio").disabled = true;
+                document.getElementById("txtHoraFin").disabled = true;
+                document.getElementById("txtEspacioId").focus();
                 document.getElementById("txtEspacioId").value = "";
-                document.getElementById("txtFecha").value = "";
                 document.getElementById("txtHoraInicio").value = "";
                 document.getElementById("txtHoraFin").value = "";
-                document.getElementById("selEstado").value = "Pendiente";
             };
             document.getElementById("btnm").onclick = function () {
                 document.getElementById("btnc").disabled = false;
                 document.getElementById("btna").disabled = true;
                 document.getElementById("btnm").disabled = true;
                 document.getElementById("btnac").disabled = false;
-                document.getElementById("txtUsuarioId").disabled = false;
                 document.getElementById("txtEspacioId").disabled = false;
-                document.getElementById("txtFecha").disabled = false;
                 document.getElementById("txtHoraInicio").disabled = false;
                 document.getElementById("txtHoraFin").disabled = false;
-                document.getElementById("selEstado").disabled = false;
-                document.getElementById("txtUsuarioId").focus();
             };
-            if ($('#txtUsuarioId').val().length !== 0) {
-                document.getElementById("btnm").disabled = false;
-            }
-            ;
-
         </script>
     </body>
 </html>
