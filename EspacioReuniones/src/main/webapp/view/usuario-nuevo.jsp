@@ -11,12 +11,17 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <!--De bootstrap-->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.1/css/all.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
         <!-- Los iconos tipo Solid de Fontawesome-->
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.1/css/all.css">
         <script src="https://use.fontawesome.com/releases/v6.1.1/js/all.js"></script>
 
         <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.2/css/jquery.dataTables.css">
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.js"></script>
+
         <title>Usuarios</title>
 
         <!--Para paginacion de la tabla-->
@@ -26,8 +31,18 @@
         <div class="container">
             <!--PARA MOSTRAR E INGRESAR LOS DATOS DEL USUARIO-->
             <form id="usuarioForm" method="post">
-                <input type="hidden" name="id" value="${usuario.id}">
-                <h5><i class="fa-solid fa-user"></i> Datos del Usuario</h5>
+                <input type="hidden" name="id" value="${usuario.id}" id="userId">
+                <h5>
+                    <i class="fa-solid fa-user"></i>
+                    <c:choose>
+                        <c:when test="${sessionScope.rol == 'Superadministrador'}">
+                            Datos del Usuario
+                        </c:when>
+                        <c:otherwise>
+                            Mi Perfil
+                        </c:otherwise>
+                    </c:choose>
+                </h5>
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
@@ -64,7 +79,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label>Password</label>
-                                    <input type="email" name="txtPassword" id="txtPassword" value="${usuario.password}" class="form-control" disabled>
+                                    <input type="password" name="txtPassword" id="txtPassword" value="${usuario.password}" class="form-control" disabled>
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -89,23 +104,34 @@
                             </div>
 
                             <div class="form-group mt-4 text-center">
-                                <button type="button" id="btna" class="btn btn-primary">Agregar</button>
-                                <button type="button" id="btng" class="btn btn-danger" disabled>Guardar</button>
-                                <button type="button" id="btnm" class="btn btn-info" disabled>Modificar</button>
-                                <button type="button" id="btnac" class="btn btn-success" disabled>Actualizar</button>
-                                <button type="button" id="btnc" class="btn btn-warning" disabled>Cancelar</button>
+                                <c:choose>
+                                    <c:when test="${sessionScope.rol == 'Superadministrador'}">
+                                        <button type="button" id="btna" class="btn btn-primary">Agregar</button>
+                                        <button type="button" id="btng" class="btn btn-danger" disabled>Guardar</button>
+                                        <button type="button" id="btnm" class="btn btn-info" disabled>Modificar</button>
+                                        <button type="button" id="btnac" class="btn btn-success" disabled>Actualizar</button>
+                                        <button type="button" id="btnc" class="btn btn-warning" disabled>Cancelar</button>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <button type="button" id="btnm" class="btn btn-info">Modificar</button>
+                                        <button type="button" id="btnac" class="btn btn-success" disabled>Actualizar</button>
+                                        <button type="button" id="btnc" class="btn btn-warning" disabled>Cancelar</button>
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
                         </div>
                     </div>
                 </div>
             </form>
 
-            <!--PARA MOSTRAR EL LISTADO DE USUARIOS-->                        
-            <h5 class="text-center mt-3">Listado de Usuarios</h5>
-            <div class="card">
-                <div class="card-body">
-                    <table class="table table-hover" id="mi_tabla">
-                        <thead>
+            <!-- Solo mostrar la tabla si es Superadministrador -->
+            <c:if test="${sessionScope.rol == 'Superadministrador'}">
+                <!--PARA MOSTRAR EL LISTADO DE USUARIOS-->
+                <h5 class="text-center mt-3">Listado de Usuarios</h5>
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-hover" id="mi_tabla">
+                            <thead>
                             <tr>
                                 <th class="text-center">ID</th>
                                 <th class="text-center">Nombres</th>
@@ -117,8 +143,8 @@
                                 <th class="text-center">Ubicación ID</th>
                                 <th class="text-center">Acciones</th>
                             </tr>
-                        </thead>
-                        <tbody>
+                            </thead>
+                            <tbody>
                             <c:forEach var="usr" items="${usuarios}">
                                 <tr class="text-center">
                                     <td>${usr.getId()}</td>
@@ -135,11 +161,11 @@
                                     </td>
                                 </tr>
                             </c:forEach>
-
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
+            </c:if>
         </div>
 
         <!--De JavaScript-->
@@ -153,7 +179,10 @@
 
         <!--De JS-->
         <script type="text/javascript">
-            //Para la actualizacion de la tabla usuario
+            // Variables globales
+            const isSuperAdmin = '${sessionScope.rol}' === 'Superadministrador';
+
+            // Esperar a que el documento esté completamente cargado
             $(document).ready(function () {
                 $('#mi_tabla').DataTable({
                     language: {
@@ -162,122 +191,179 @@
                 });
             });
 
-            document.getElementById("btnc").onclick = function () {
-                document.getElementById("btnc").disabled = true;
-                document.getElementById("btna").disabled = false;
-                document.getElementById("btng").disabled = true;
-                document.getElementById("btnac").disabled = true;
-                document.getElementById("txtNombres").disabled = true;
-                document.getElementById("txtApellidos").disabled = true;
-                document.getElementById("txtDni").disabled = true;
-                document.getElementById("txtCodigoAlumno").disabled = true;
-                document.getElementById("txtEmail").disabled = true;
-                document.getElementById("txtRol").disabled = true;
-                document.getElementById("txtUbicacionId").disabled = true;
-                document.getElementById("txtPassword").disabled = true;
-            };
-            document.getElementById("btna").onclick = function () {
-                document.getElementById("btnc").disabled = false;
-                document.getElementById("btna").disabled = true;
-                document.getElementById("btnm").disabled = true;
-                document.getElementById("btng").disabled = false;
-                document.getElementById("txtNombres").disabled = false;
-                document.getElementById("txtApellidos").disabled = false;
-                document.getElementById("txtDni").disabled = false;
-                document.getElementById("txtCodigoAlumno").disabled = false;
-                document.getElementById("txtEmail").disabled = false;
-                document.getElementById("txtRol").disabled = false;
-                document.getElementById("txtUbicacionId").disabled = false;
-                document.getElementById("txtPassword").disabled = false;
-                document.getElementById("txtNombres").focus();
-                document.getElementById("txtNombres").value = "";
-                document.getElementById("txtApellidos").value = "";
-                document.getElementById("txtDni").value = "";
-                document.getElementById("txtCodigoAlumno").value = "";
-                document.getElementById("txtEmail").value = "";
-                document.getElementById("txtRol").value = "";
-                document.getElementById("txtUbicacionId").value = "";
-                document.getElementById("txtPassword").value = "";
-            };
-            document.getElementById("btnm").onclick = function () {
-                document.getElementById("btnc").disabled = false;
-                document.getElementById("btna").disabled = true;
-                document.getElementById("btnm").disabled = true;
-                document.getElementById("btnac").disabled = false;
-                document.getElementById("txtNombres").disabled = false;
-                document.getElementById("txtApellidos").disabled = false;
-                document.getElementById("txtDni").disabled = false;
-                document.getElementById("txtCodigoAlumno").disabled = false;
-                document.getElementById("txtEmail").disabled = false;
-                document.getElementById("txtRol").disabled = false;
-                document.getElementById("txtUbicacionId").disabled = false;
-                document.getElementById("txtPassword").disabled = false;
-                document.getElementById("txtNombres").focus();
-            };
-            if ($('#txtNombres').val().length !== 0) {
-                document.getElementById("btnm").disabled = false;
+            if (isSuperAdmin) {
+
+                document.getElementById("btnc").onclick = function () {
+                    document.getElementById("btnc").disabled = true;
+                    document.getElementById("btna").disabled = false;
+                    document.getElementById("btng").disabled = true;
+                    document.getElementById("btnac").disabled = true;
+                    document.getElementById("txtNombres").disabled = true;
+                    document.getElementById("txtApellidos").disabled = true;
+                    document.getElementById("txtDni").disabled = true;
+                    document.getElementById("txtCodigoAlumno").disabled = true;
+                    document.getElementById("txtEmail").disabled = true;
+                    document.getElementById("txtRol").disabled = true;
+                    document.getElementById("txtUbicacionId").disabled = true;
+                    document.getElementById("txtPassword").disabled = true;
+                };
+                document.getElementById("btna").onclick = function () {
+                    document.getElementById("btnc").disabled = false;
+                    document.getElementById("btna").disabled = true;
+                    document.getElementById("btnm").disabled = true;
+                    document.getElementById("btng").disabled = false;
+                    document.getElementById("txtNombres").disabled = false;
+                    document.getElementById("txtApellidos").disabled = false;
+                    document.getElementById("txtDni").disabled = false;
+                    document.getElementById("txtCodigoAlumno").disabled = false;
+                    document.getElementById("txtEmail").disabled = false;
+                    document.getElementById("txtRol").disabled = false;
+                    document.getElementById("txtUbicacionId").disabled = false;
+                    document.getElementById("txtPassword").disabled = false;
+                    document.getElementById("txtNombres").focus();
+                    document.getElementById("txtNombres").value = "";
+                    document.getElementById("txtApellidos").value = "";
+                    document.getElementById("txtDni").value = "";
+                    document.getElementById("txtCodigoAlumno").value = "";
+                    document.getElementById("txtEmail").value = "";
+                    document.getElementById("txtRol").value = "";
+                    document.getElementById("txtUbicacionId").value = "";
+                    document.getElementById("txtPassword").value = "";
+                };
+                document.getElementById("btnm").onclick = function () {
+                    document.getElementById("btnc").disabled = false;
+                    document.getElementById("btna").disabled = true;
+                    document.getElementById("btnm").disabled = true;
+                    document.getElementById("btnac").disabled = false;
+                    document.getElementById("txtNombres").disabled = false;
+                    document.getElementById("txtApellidos").disabled = false;
+                    document.getElementById("txtDni").disabled = false;
+                    document.getElementById("txtCodigoAlumno").disabled = false;
+                    document.getElementById("txtEmail").disabled = false;
+                    document.getElementById("txtRol").disabled = false;
+                    document.getElementById("txtUbicacionId").disabled = false;
+                    document.getElementById("txtPassword").disabled = false;
+                    document.getElementById("txtNombres").focus();
+                };
+                if ($('#txtNombres').val().length !== 0) {
+                    document.getElementById("btnm").disabled = false;
+                }
+
+                function prepararParaGuardar() {
+                    document.getElementById("txtNombres").disabled = false;
+                    document.getElementById("txtApellidos").disabled = false;
+                    document.getElementById("txtDni").disabled = false;
+                    document.getElementById("txtCodigoAlumno").disabled = false;
+                    document.getElementById("txtEmail").disabled = false;
+                    document.getElementById("txtRol").disabled = false;
+                    document.getElementById("txtUbicacionId").disabled = false;
+                    document.getElementById("txtPassword").disabled = false;
+                    document.getElementById("btnac").disabled = true;
+                    document.getElementById("btna").disabled = true;
+                    document.getElementById("btng").disabled = false;
+                    document.getElementById("btnm").disabled = true;
+                    document.getElementById("btnc").disabled = false;
+                }
+
+                function prepararParaEditar() {
+                    document.getElementById("txtNombres").disabled = false;
+                    document.getElementById("txtApellidos").disabled = false;
+                    document.getElementById("txtDni").disabled = false;
+                    document.getElementById("txtCodigoAlumno").disabled = false;
+                    document.getElementById("txtEmail").disabled = false;
+                    document.getElementById("txtRol").disabled = false;
+                    document.getElementById("txtUbicacionId").disabled = false;
+                    document.getElementById("txtPassword").disabled = false;
+                    document.getElementById("btnac").disabled = false;
+                    document.getElementById("btna").disabled = true;
+                    document.getElementById("btng").disabled = true;
+                    document.getElementById("btnm").disabled = true;
+                    document.getElementById("btnc").disabled = false;
+                }
+
+                if (document.getElementById("txtNombres").value !== "" && document.getElementById("txtApellidos").value !== "") {
+                    prepararParaEditar();
+                }
+
+                document.getElementById("btnc").onclick = function () {
+                    document.getElementById("btnc").disabled = true;
+                    document.getElementById("btna").disabled = false;
+                    document.getElementById("btng").disabled = true;
+                    document.getElementById("btnac").disabled = true;
+                    document.getElementById("txtNombres").disabled = true;
+                    document.getElementById("txtApellidos").disabled = true;
+                    document.getElementById("txtDni").disabled = true;
+                    document.getElementById("txtCodigoAlumno").disabled = true;
+                    document.getElementById("txtEmail").disabled = true;
+                    document.getElementById("txtRol").disabled = true;
+                    document.getElementById("txtUbicacionId").disabled = true;
+                    document.getElementById("txtPassword").disabled = true;
+                };
+
+                document.getElementById("btng").onclick = function () {
+                    document.getElementById("usuarioForm").action = "UsuarioServlet?action=guardar";
+                    document.getElementById("usuarioForm").submit();
+                };
+
+                document.getElementById("btnac").onclick = function () {
+                    document.getElementById("usuarioForm").action = "UsuarioServlet?action=actualizar";
+                    document.getElementById("usuarioForm").submit();
+                };
+
+            } else {
+                document.getElementById("btnc").onclick = function () {
+                    document.getElementById("btnc").disabled = true;
+                    document.getElementById("btnm").disabled = false;
+                    document.getElementById("btnac").disabled = true;
+
+                    // Deshabilitar todos los campos
+                    const campos = ["txtNombres", "txtApellidos", "txtDni", "txtCodigoAlumno",
+                        "txtEmail", "txtPassword", "txtRol", "txtUbicacionId"];
+                    campos.forEach(campo => {
+                        document.getElementById(campo).disabled = true;
+                    });
+                };
+
+                // Botón modificar
+                document.getElementById("btnm").onclick = function () {
+                    document.getElementById("btnc").disabled = false;    // Habilitar cancelar
+                    document.getElementById("btnac").disabled = false;   // Habilitar actualizar
+                    document.getElementById("btnm").disabled = true;     // Deshabilitar modificar
+
+                    // Habilitar campos editables
+                    const camposEditables = ["txtNombres", "txtApellidos", "txtDni",
+                        "txtCodigoAlumno", "txtEmail", "txtPassword"];
+                    camposEditables.forEach(campo => {
+                        document.getElementById(campo).disabled = false;
+                    });
+
+                    // Mantener campos restringidos
+                    document.getElementById("txtRol").disabled = true;
+                    document.getElementById("txtUbicacionId").disabled = true;
+
+                    document.getElementById("txtNombres").focus();
+                };
+
+                // Botón actualizar para usuarios no superadmin
+                document.getElementById("btnac").onclick = function () {
+                    document.getElementById("usuarioForm").action = "UsuarioServlet?action=actualizar";
+                    // No necesitamos validar el ID aquí porque usaremos el ID de la sesión
+                    document.getElementById("usuarioForm").submit();
+                };
+
+                // Habilitar botón modificar si hay datos
+                if (document.getElementById("txtNombres").value !== "") {
+                    document.getElementById("btnm").disabled = false;
+                }
+
+                // Estado inicial para edición si hay datos
+                if (document.getElementById("txtNombres").value !== "" &&
+                    document.getElementById("txtApellidos").value !== "") {
+                    document.getElementById("btnm").disabled = false;
+                    document.getElementById("btnc").disabled = true;
+                    document.getElementById("btnac").disabled = true;
+                }
             }
-
-            function prepararParaGuardar() {
-                document.getElementById("txtNombres").disabled = false;
-                document.getElementById("txtApellidos").disabled = false;
-                document.getElementById("txtDni").disabled = false;
-                document.getElementById("txtCodigoAlumno").disabled = false;
-                document.getElementById("txtEmail").disabled = false;
-                document.getElementById("txtRol").disabled = false;
-                document.getElementById("txtUbicacionId").disabled = false;
-                document.getElementById("txtPassword").disabled = false;
-                document.getElementById("btnac").disabled = true;
-                document.getElementById("btna").disabled = true;
-                document.getElementById("btng").disabled = false;
-                document.getElementById("btnm").disabled = true;
-                document.getElementById("btnc").disabled = false;
-            }
-
-            function prepararParaEditar() {
-                document.getElementById("txtNombres").disabled = false;
-                document.getElementById("txtApellidos").disabled = false;
-                document.getElementById("txtDni").disabled = false;
-                document.getElementById("txtCodigoAlumno").disabled = false;
-                document.getElementById("txtEmail").disabled = false;
-                document.getElementById("txtRol").disabled = false;
-                document.getElementById("txtUbicacionId").disabled = false;
-                document.getElementById("txtPassword").disabled = false;
-                document.getElementById("btnac").disabled = false;
-                document.getElementById("btna").disabled = true;
-                document.getElementById("btng").disabled = true;
-                document.getElementById("btnm").disabled = true;
-                document.getElementById("btnc").disabled = false;
-            }
-
-            if (document.getElementById("txtNombres").value !== "" && document.getElementById("txtApellidos").value !== "") {
-                prepararParaEditar();
-            }
-
-            document.getElementById("btnc").onclick = function () {
-                document.getElementById("btnc").disabled = true;
-                document.getElementById("btna").disabled = false;
-                document.getElementById("btng").disabled = true;
-                document.getElementById("btnac").disabled = true;
-                document.getElementById("txtNombres").disabled = true;
-                document.getElementById("txtApellidos").disabled = true;
-                document.getElementById("txtDni").disabled = true;
-                document.getElementById("txtCodigoAlumno").disabled = true;
-                document.getElementById("txtEmail").disabled = true;
-                document.getElementById("txtRol").disabled = true;
-                document.getElementById("txtUbicacionId").disabled = true;
-                document.getElementById("txtPassword").disabled = true;
-            };
-            
-            document.getElementById("btng").onclick = function () {
-                document.getElementById("usuarioForm").action = "UsuarioServlet?action=guardar";
-                document.getElementById("usuarioForm").submit();
-            };
-
-            document.getElementById("btnac").onclick = function () {
-                document.getElementById("usuarioForm").action = "UsuarioServlet?action=actualizar";
-                document.getElementById("usuarioForm").submit();
-            };
 
         </script>
     </body>
