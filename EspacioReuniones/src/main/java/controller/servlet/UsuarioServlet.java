@@ -159,74 +159,100 @@ public class UsuarioServlet extends HttpServlet {
             response.sendRedirect("UsuarioServlet?action=nuevo");
         }
     }
-    
-    private void obtenerUsuario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        listaUsuarios(request);
 
-        int id = Integer.parseInt(request.getParameter("id"));
-       
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
-        Usuario usuario = usuarioDAO.obtenerUsuarioPorId(id);
-        request.setAttribute("usuario", usuario);
+    private void obtenerUsuario(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-        request.setAttribute("pageContent", "/view/usuario-nuevo.jsp");
-        request.getRequestDispatcher("/view/main.jsp").forward(request, response);
+        HttpSession session = request.getSession();
+        Integer usuarioIdSesion = (Integer) session.getAttribute("usuarioId");
+        String rolUsuario = (String) session.getAttribute("rol");
+
+        int idUsuarioAEditar = Integer.parseInt(request.getParameter("id"));
+
+        // Verificar si es el mismo usuario o tiene rol Superadministrador
+        if (usuarioIdSesion == idUsuarioAEditar || "Superadministrador".equals(rolUsuario)) {
+            listaUsuarios(request);
+
+            UsuarioDAO usuarioDAO = new UsuarioDAO();
+            Usuario usuario = usuarioDAO.obtenerUsuarioPorId(idUsuarioAEditar);
+            request.setAttribute("usuario", usuario);
+
+            request.setAttribute("pageContent", "/view/usuario-nuevo.jsp");
+            request.getRequestDispatcher("/view/main.jsp").forward(request, response);
+        } else {
+            // Si no tiene permisos, redirigir a la lista con un mensaje de error
+            request.setAttribute("error", "No tiene permisos para editar este usuario");
+            response.sendRedirect("UsuarioServlet?action=listar");
+        }
     }
 
+    private void actualizarUsuario(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-    private void eliminarUsuario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Integer usuarioIdSesion = (Integer) session.getAttribute("usuarioId");
+        String rolUsuario = (String) session.getAttribute("rol");
+
+        int idUsuarioAActualizar = Integer.parseInt(request.getParameter("id"));
+
+        // Verificar si es el mismo usuario o tiene rol Superadministrador
+        if (usuarioIdSesion == idUsuarioAActualizar || "Superadministrador".equals(rolUsuario)) {
+            String nombres = request.getParameter("txtNombres");
+            String apellidos = request.getParameter("txtApellidos");
+            String dni = request.getParameter("txtDni");
+            String codigoAlumno = request.getParameter("txtCodigoAlumno");
+            String email = request.getParameter("txtEmail");
+            String password = request.getParameter("txtPassword");
+            String pass = PasswordUtil.hashPassword(password);
+            String rol = request.getParameter("txtRol");
+            String ubicacionId = request.getParameter("txtUbicacionId");
+
+            int ubicacion = Integer.parseInt(ubicacionId);
+
+            Usuario usuario = new Usuario();
+            usuario.setId(idUsuarioAActualizar);
+            usuario.setNombres(nombres);
+            usuario.setApellidos(apellidos);
+            usuario.setDni(dni);
+            usuario.setCodigoAlumno(codigoAlumno);
+            usuario.setEmail(email);
+            usuario.setPassword(pass);
+            usuario.setRol(rol);
+            usuario.setUbicacionId(ubicacion);
+
+            UsuarioDAO usuarioDAO = new UsuarioDAO();
+            if (usuarioDAO.actualizarUsuario(usuario)) {
+                response.sendRedirect("UsuarioServlet?action=listar");
+            } else {
+                response.sendRedirect("UsuarioServlet?action=editar&id=" + idUsuarioAActualizar);
+            }
+        } else {
+            // Si no tiene permisos, redirigir a la lista con un mensaje de error
+            request.setAttribute("error", "No tiene permisos para actualizar este usuario");
+            response.sendRedirect("UsuarioServlet?action=listar");
+        }
+    }
+
+    private void eliminarUsuario(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        HttpSession session = request.getSession();
+        String rolUsuario = (String) session.getAttribute("rol");
+
+        // Solo permitir eliminar usuarios si es Superadministrador
+        if (!"Superadministrador".equals(rolUsuario)) {
+            request.setAttribute("error", "No tiene permisos para eliminar usuarios");
+            response.sendRedirect("UsuarioServlet?action=listar");
+            return;
+        }
+
         int id = Integer.parseInt(request.getParameter("id"));
-
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         if (usuarioDAO.eliminarUsuario(id)) {
             response.sendRedirect("UsuarioServlet?action=listar");
         } else {
-            response.sendRedirect("UsuarioServlet?action=eliminar&id=" + id);
-        }
-    }
-
-    private void actualizarUsuario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-
-        String nombres = request.getParameter("txtNombres");
-        String apellidos = request.getParameter("txtApellidos");
-        String dni = request.getParameter("txtDni");
-        String codigoAlumno = request.getParameter("txtCodigoAlumno");
-        String email = request.getParameter("txtEmail");
-        String password = request.getParameter("txtPassword");
-        String pass = PasswordUtil.hashPassword(password);
-        String rol = request.getParameter("txtRol");
-        String ubicacionId = request.getParameter("txtUbicacionId");
-        
-        int ubicacion = Integer.parseInt(ubicacionId);
-
-        Usuario usuario = new Usuario();
-        usuario.setId(id);
-        usuario.setNombres(nombres);
-        usuario.setApellidos(apellidos);
-        usuario.setDni(dni);
-        usuario.setCodigoAlumno(codigoAlumno);
-        usuario.setEmail(email);
-        usuario.setPassword(pass);
-        usuario.setRol(rol);
-        usuario.setUbicacionId(ubicacion);
-
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
-        if (usuarioDAO.actualizarUsuario(usuario)) {
+            request.setAttribute("error", "No se pudo eliminar el usuario");
             response.sendRedirect("UsuarioServlet?action=listar");
-        } else {
-            response.sendRedirect("UsuarioServlet?action=editar&id=" + id);
-        }
-    }
-
-    private void eliminarUsuario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
-        if (usuarioDAO.eliminarUsuario(id)) {
-            response.sendRedirect("UsuarioServlet?action=listar");
-        } else {
-            response.sendRedirect("UsuarioServlet?action=eliminar&id=" + id);
         }
     }
 
@@ -244,6 +270,8 @@ public class UsuarioServlet extends HttpServlet {
             // Iniciar la sesión y guardar el ID del usuario
             HttpSession session = request.getSession();
             session.setAttribute("usuarioId", usuario.getId());
+            session.setAttribute("rol", usuario.getRol());
+
             response.sendRedirect("InicioServlet?action=inicio");
 
         }
