@@ -81,6 +81,7 @@ public class UsuarioServlet extends HttpServlet {
                 break;
             case "new":
                 crear(request, response);
+                break;
             case "crear":
                 guardar(request, response);
             case "listar":

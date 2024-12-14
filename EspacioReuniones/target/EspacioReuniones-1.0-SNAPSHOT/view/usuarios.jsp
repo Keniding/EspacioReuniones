@@ -195,12 +195,17 @@
             <!-- Vista para administradores -->
             <c:if test="${sessionScope.rol == 'Superadministrador' || sessionScope.rol == 'Administrador_seccion'}">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
                             <i class="fas fa-table me-2"></i>
                             Gestión de Usuarios
                         </h5>
+                        <a href="UsuarioServlet?action=exportarExcel" class="btn btn-success">
+                            <i class="fas fa-file-excel me-2"></i>
+                            Exportar a Excel
+                        </a>
                     </div>
+
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-hover">
