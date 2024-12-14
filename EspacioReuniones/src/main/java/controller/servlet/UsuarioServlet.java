@@ -187,7 +187,7 @@ public class UsuarioServlet extends HttpServlet {
     }
 
     private void actualizarUsuario(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
 
         HttpSession session = request.getSession();
         Integer usuarioIdSesion = (Integer) session.getAttribute("usuarioId");
@@ -203,11 +203,23 @@ public class UsuarioServlet extends HttpServlet {
             String codigoAlumno = request.getParameter("txtCodigoAlumno");
             String email = request.getParameter("txtEmail");
             String password = request.getParameter("txtPassword");
-            String pass = PasswordUtil.hashPassword(password);
             String rol = request.getParameter("txtRol");
             String ubicacionId = request.getParameter("txtUbicacionId");
-
             int ubicacion = Integer.parseInt(ubicacionId);
+
+            // Obtener el usuario actual de la base de datos
+            UsuarioDAO usuarioDAO = new UsuarioDAO();
+            Usuario usuarioExistente = usuarioDAO.obtenerUsuarioPorId(idUsuarioAActualizar);
+
+            // Comparar si la contraseña ha cambiado
+            String pass;
+            if (password.equals(usuarioExistente.getPassword())) {
+                // Si la contraseña es igual a la almacenada, mantener la misma
+                pass = usuarioExistente.getPassword();
+            } else {
+                // Si la contraseña es diferente, hashear la nueva
+                pass = PasswordUtil.hashPassword(password);
+            }
 
             Usuario usuario = new Usuario();
             usuario.setId(idUsuarioAActualizar);
@@ -220,7 +232,6 @@ public class UsuarioServlet extends HttpServlet {
             usuario.setRol(rol);
             usuario.setUbicacionId(ubicacion);
 
-            UsuarioDAO usuarioDAO = new UsuarioDAO();
             if (usuarioDAO.actualizarUsuario(usuario)) {
                 response.sendRedirect("UsuarioServlet?action=listar");
             } else {

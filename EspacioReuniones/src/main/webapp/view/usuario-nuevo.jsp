@@ -76,23 +76,27 @@
                             </div>
                             <div></div>
 
-                            <c:if test="${sessionScope.rol == 'Superadministrador' || sessionScope.rol == 'Administrador_seccion'}">
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Rol</label>
-                                        <select name="txtRol" id="txtRol" class="form-control">
+                                        <select name="txtRol" id="txtRol" class="form-control" 
+                                                <c:if test="${sessionScope.rol != 'Superadministrador' && sessionScope.rol != 'Administrador_seccion'}">disabled</c:if>>
+
+                                            <%-- Roles administrativos (solo visibles para Superadministrador) --%>
                                             <c:if test="${sessionScope.rol == 'Superadministrador'}">
                                                 <option value="Superadministrador" ${usuario.rol == 'Superadministrador' ? 'selected' : ''}>Superadministrador</option>
                                                 <option value="Coordinador_ubicacion" ${usuario.rol == 'Coordinador_ubicacion' ? 'selected' : ''}>Coordinador_ubicacion</option>
                                                 <option value="Administrador_seccion" ${usuario.rol == 'Administrador_seccion' ? 'selected' : ''}>Administrador_seccion</option>
                                             </c:if>
+
+                                            <%-- Roles básicos (siempre visibles) --%>
                                             <option value="Empleado" ${usuario.rol == 'Empleado' ? 'selected' : ''}>Empleado</option>
                                             <option value="Invitado" ${usuario.rol == 'Invitado' ? 'selected' : ''}>Invitado</option>
                                             <option value="Asistente_reserva" ${usuario.rol == 'Asistente_reserva' ? 'selected' : ''}>Asistente_reserva</option>
                                         </select>
                                     </div>
                                 </div>
-                            </c:if>
+
 
                             <div class="form-group mt-4 text-center">
                                 <button type="button" id="btna" class="btn btn-primary">Agregar</button>
