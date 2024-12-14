@@ -28,9 +28,20 @@
                 <li class="nav-item"><a class="nav-link" href="UbicacionServlet?action=listar">Ubicaciones</a></li>               
                 <li class="nav-item"><a class="nav-link" href="SeccionServlet?action=listar">Secciones</a></li>
                 <li class="nav-item"><a class="nav-link" href="EspacioServlet?action=listar">Espacios</a></li>
-                <li class="nav-item"><a class="nav-link" href="UsuarioServlet?action=listar">Usuarios</a></li>
+                <c:if test="${sessionScope.rol == 'Superadministrador'}">
+                    <li class="nav-item"><a class="nav-link" href="UsuarioServlet?action=listar">Usuarios</a></li>
+                </c:if>
+                <c:if test="${sessionScope.rol != 'Superadministrador'}">
+                    <li class="nav-item"><a class="nav-link" href="UsuarioServlet?action=listar">Editar Perfil</a></li>
+                    
+                </c:if>      
                 <li class="nav-item"><a class="nav-link" href="MainServlet?action=reservar">Reservar Espacio</a></li>
                 <li class="nav-item"><a class="nav-link" href="ReservaServlet?action=listar">Mis Reservas</a></li>
+                <li class="nav-item">
+                    <a class="nav-link" href="UsuarioServlet?action=verPerfil">
+                        <i class="fas fa-user-circle"></i> Yo
+                    </a>
+                </li>
                 <li class="nav-item"><a class="nav-link" href="UsuarioServlet?action=logout">Cerrar Sesión</a></li>
             </ul>
         </div>

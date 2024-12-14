@@ -101,6 +101,12 @@ public class UsuarioServlet extends HttpServlet {
             case "eliminar":
                 eliminarUsuario(request, response);
                 break;
+            case "verPerfil":
+                mostrarPerfil(request, response);
+                break;
+            case "actualizarPerfil":
+                actualizarPerfil(request, response);
+                break;
             default:
                 listarUsuarios(request, response);
                 break;
@@ -345,6 +351,68 @@ public class UsuarioServlet extends HttpServlet {
             //response.sendRedirect("InicioServlet?action=inicio");
         } else {
             //response.sendRedirect("UsuarioServlet?action=nuevo");
+        }
+    }
+    
+    private void mostrarPerfil(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Integer usuarioId = (Integer) session.getAttribute("usuarioId");
+
+        if (usuarioId != null) {
+            UsuarioDAO usuarioDAO = new UsuarioDAO();
+            Usuario usuario = usuarioDAO.obtenerUsuarioPorId(usuarioId);
+            request.setAttribute("usuario", usuario);
+
+            request.setAttribute("pageContent", "/view/perfil.jsp");
+            request.getRequestDispatcher("/view/main.jsp").forward(request, response);
+        } else {
+            response.sendRedirect("login.jsp");
+        }
+    }
+
+    private void actualizarPerfil(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Integer usuarioId = (Integer) session.getAttribute("usuarioId");
+
+        if (usuarioId != null) {
+            String nombres = request.getParameter("txtNombres");
+            String apellidos = request.getParameter("txtApellidos");
+            String dni = request.getParameter("txtDni");
+            String codigoAlumno = request.getParameter("txtCodigoAlumno");
+            String email = request.getParameter("txtEmail");
+            String password = request.getParameter("txtPassword");
+
+            UsuarioDAO usuarioDAO = new UsuarioDAO();
+            Usuario usuarioExistente = usuarioDAO.obtenerUsuarioPorId(usuarioId);
+
+            Usuario usuario = new Usuario();
+            usuario.setId(usuarioId);
+            usuario.setNombres(nombres);
+            usuario.setApellidos(apellidos);
+            usuario.setDni(dni);
+            usuario.setCodigoAlumno(codigoAlumno);
+            usuario.setEmail(email);
+            usuario.setRol(usuarioExistente.getRol());
+            usuario.setUbicacionId(usuarioExistente.getUbicacionId());
+
+            // Manejar la contraseña
+            if (password != null && !password.trim().isEmpty()) {
+                usuario.setPassword(PasswordUtil.hashPassword(password));
+            } else {
+                usuario.setPassword(usuarioExistente.getPassword());
+            }
+
+            if (usuarioDAO.actualizarUsuario(usuario)) {
+                request.setAttribute("mensaje", "Perfil actualizado correctamente");
+            } else {
+                request.setAttribute("error", "Error al actualizar el perfil");
+            }
+
+            response.sendRedirect("UsuarioServlet?action=verPerfil");
+        } else {
+            response.sendRedirect("login.jsp");
         }
     }
 }
