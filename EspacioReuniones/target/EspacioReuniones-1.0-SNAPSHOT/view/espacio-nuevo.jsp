@@ -1,135 +1,297 @@
-<%-- 
-    Document   : espacios
-    Created on : 19 oct 2024, 22:15:59
-    Author     : Henry
---%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <!--De bootstrap-->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-        <!-- Los iconos tipo Solid de Fontawesome-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Gestión de Espacios</title>
+        
+        <!-- Bootstrap 5 -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- FontAwesome -->
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.1/css/all.css">
-        <script src="https://use.fontawesome.com/releases/v6.1.1/js/all.js"></script>
-
-        <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
-        <title>Espacios</title>
-
-        <!--Para paginacion de la tabla-->
+        <!-- DataTables -->
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.2/css/jquery.dataTables.css">
+        <!-- Custom CSS -->
+        <style>
+            :root {
+                --primary-color: #2c3e50;
+                --secondary-color: #3498db;
+                --success-color: #2ecc71;
+                --warning-color: #f1c40f;
+                --danger-color: #e74c3c;
+            }
+
+            body {
+                background-color: #f8f9fa;
+                color: var(--primary-color);
+            }
+
+            .card {
+                border: none;
+                border-radius: 15px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                margin-bottom: 2rem;
+            }
+
+            .card-header {
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                color: white;
+                border-radius: 15px 15px 0 0 !important;
+                padding: 1.5rem;
+            }
+
+            .form-control, .form-select {
+                border-radius: 8px;
+                border: 1px solid #dee2e6;
+                padding: 0.75rem;
+                transition: all 0.3s ease;
+            }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--secondary-color);
+                box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+            }
+
+            .form-control:disabled, .form-select:disabled {
+                background-color: #f8f9fa;
+                cursor: not-allowed;
+            }
+
+            .btn {
+                border-radius: 8px;
+                padding: 0.5rem 1.5rem;
+                font-weight: 500;
+                transition: all 0.3s ease;
+            }
+
+            .btn:hover {
+                transform: translateY(-2px);
+            }
+
+            .btn-icon {
+                padding: 0.5rem;
+                width: 38px;
+                height: 38px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 0.25rem;
+            }
+
+            .table {
+                border-radius: 15px;
+                overflow: hidden;
+            }
+
+            .table thead th {
+                background-color: #f8f9fa;
+                border-bottom: 2px solid #dee2e6;
+                color: var(--primary-color);
+                font-weight: 600;
+                text-transform: uppercase;
+                font-size: 0.85rem;
+            }
+
+            .badge {
+                padding: 0.5rem 1rem;
+                border-radius: 20px;
+                font-weight: 500;
+            }
+
+            .badge-disponible {
+                background-color: var(--success-color);
+                color: white;
+            }
+
+            .badge-ocupado {
+                background-color: var(--warning-color);
+                color: var(--primary-color);
+            }
+
+            .badge-deshabilitado {
+                background-color: #95a5a6;
+                color: white;
+            }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+                background: var(--secondary-color) !important;
+                border-color: var(--secondary-color) !important;
+                color: white !important;
+            }
+
+            .form-floating > label {
+                padding: 1rem;
+            }
+
+            .form-floating > .form-control {
+                height: calc(3.5rem + 2px);
+                line-height: 1.25;
+            }
+        </style>
     </head>
     <body>
-        <div class="container">
-            <!--PARA MOSTRAR E INGRESAR LOS DATOS DEL ESPACIO-->
+        <div class="container py-4">
+            <!-- Formulario -->
             <form id="espacioForm" method="post">
                 <input type="hidden" name="id" value="${espacio.id}">
-                <h5><i class="fa-solid fa-square"></i> Datos del Espacio</h5>
                 <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fa-solid fa-building-user me-2"></i>
+                            Gestión de Espacio
+                        </h5>
+                    </div>
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label>Nombre</label>
-                                    <input type="text" name="txtNombre" id="txtNombre" value="${espacio.nombre}" class="form-control" disabled>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="txtNombre" id="txtNombre" 
+                                           value="${espacio.nombre}" class="form-control" 
+                                           placeholder="Nombre" disabled>
+                                    <label for="txtNombre">Nombre</label>
                                 </div>
                             </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label>Capacidad</label>
-                                    <input type="number" name="txtCapacidad" id="txtCapacidad" value="${espacio.capacidad}" class="form-control" disabled>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" name="txtCapacidad" id="txtCapacidad" 
+                                           value="${espacio.capacidad}" class="form-control" 
+                                           placeholder="Capacidad" disabled>
+                                    <label for="txtCapacidad">Capacidad</label>
                                 </div>
                             </div>
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label>Descripción</label>
-                                    <textarea name="txtDescripcion" id="txtDescripcion" class="form-control" rows="3" disabled>${espacio.descripcion}</textarea>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea name="txtDescripcion" id="txtDescripcion" 
+                                              class="form-control" style="height: 100px" 
+                                              placeholder="Descripción" disabled>${espacio.descripcion}</textarea>
+                                    <label for="txtDescripcion">Descripción</label>
                                 </div>
                             </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label>Sección ID</label>
-                                    <input type="text" name="txtSeccionId" id="txtSeccionId" value="${espacio.seccionId}" class="form-control" disabled>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="txtSeccionId" id="txtSeccionId" 
+                                           value="${espacio.seccionId}" class="form-control" 
+                                           placeholder="Sección ID" disabled>
+                                    <label for="txtSeccionId">Sección ID</label>
                                 </div>
                             </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label>Ubicación ID</label>
-                                    <input type="text" name="txtUbicacionId" id="txtUbicacionId" value="${espacio.ubicacionId}" class="form-control" disabled>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="txtUbicacionId" id="txtUbicacionId" 
+                                           value="${espacio.ubicacionId}" class="form-control" 
+                                           placeholder="Ubicación ID" disabled>
+                                    <label for="txtUbicacionId">Ubicación ID</label>
                                 </div>
                             </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label>Estado</label>
-                                    <select name="txtEstado" id="txtEstado" class="form-control" disabled>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select name="txtEstado" id="txtEstado" class="form-select" disabled>
                                         <option value="Disponible" ${espacio.estado == 'Disponible' ? 'selected' : ''}>Disponible</option>
                                         <option value="Ocupado" ${espacio.estado == 'Ocupado' ? 'selected' : ''}>Ocupado</option>
                                         <option value="Deshabilitado" ${espacio.estado == 'Deshabilitado' ? 'selected' : ''}>Deshabilitado</option>
                                     </select>
+                                    <label for="txtEstado">Estado</label>
                                 </div>
                             </div>
-                            <div class="form-group mt-4 text-center">
-                                <button type="button" id="btna" class="btn btn-primary">Agregar</button>
-                                <button type="button" id="btng" class="btn btn-danger" disabled>Guardar</button>
-                                <button type="button" id="btnm" class="btn btn-info" disabled>Modificar</button>
-                                <button type="button" id="btnac" class="btn btn-success" disabled>Actualizar</button>
-                                <button type="button" id="btnc" class="btn btn-warning" disabled>Cancelar</button>
+                            <div class="col-12 text-center">
+                                <div class="btn-group" role="group">
+                                    <button type="button" id="btna" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>Agregar
+                                    </button>
+                                    <button type="button" id="btng" class="btn btn-danger" disabled>
+                                        <i class="fas fa-save me-2"></i>Guardar
+                                    </button>
+                                    <button type="button" id="btnm" class="btn btn-info" disabled>
+                                        <i class="fas fa-edit me-2"></i>Modificar
+                                    </button>
+                                    <button type="button" id="btnac" class="btn btn-success" disabled>
+                                        <i class="fas fa-check me-2"></i>Actualizar
+                                    </button>
+                                    <button type="button" id="btnc" class="btn btn-warning" disabled>
+                                        <i class="fas fa-times me-2"></i>Cancelar
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </form>
 
-            <!--PARA MOSTRAR EL LISTADO DE ESPACIOS-->                        
-            <h5 class="text-center mt-3">Listado de Espacios</h5>
+            <!-- Tabla -->
             <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fa-solid fa-table me-2"></i>
+                        Listado de Espacios
+                    </h5>
+                </div>
                 <div class="card-body">
-                    <table class="table table-hover" id="mi_tabla">
-                        <thead>
-                            <tr>
-                                <th class="text-center">ID</th>
-                                <th class="text-center">Nombre</th>
-                                <th class="text-center">Capacidad</th>
-                                <th class="text-center">Descripción</th>
-                                <th class="text-center">Sección ID</th>
-                                <th class="text-center">Ubicación ID</th>
-                                <th class="text-center">Estado</th>
-                                <th class="text-center">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:forEach var="esp" items="${espacios}">
-                                <tr class="text-center">
-                                    <td>${esp.getId()}</td>
-                                    <td>${esp.getNombre()}</td>
-                                    <td>${esp.getCapacidad()}</td>
-                                    <td>${esp.getDescripcion()}</td>
-                                    <td>${esp.getSeccionId()}</td>
-                                    <td>${esp.getUbicacionId()}</td>
-                                    <td>${esp.getEstado()}</td>
-                                    <td>
-                                        <a class="btn btn-warning" id="btned" href="EspacioServlet?action=editar&id=${esp.getId()}"><i class="fa-solid fa-pen-to-square"></i></a>
-                                        <a class="btn btn-danger" id="btnq" href="EspacioServlet?action=eliminar&id=${esp.getId()}"><i class="fa-solid fa-trash-can"></i></a>
-                                    </td>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="mi_tabla">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Capacidad</th>
+                                    <th>Descripción</th>
+                                    <th>Sección</th>
+                                    <th>Ubicación</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
                                 </tr>
-                            </c:forEach>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <c:forEach var="esp" items="${espacios}">
+                                    <tr>
+                                        <td class="text-center">${esp.getId()}</td>
+                                        <td>${esp.getNombre()}</td>
+                                        <td class="text-center">
+                                            <i class="fas fa-users me-1"></i>
+                                            ${esp.getCapacidad()}
+                                        </td>
+                                        <td>${esp.getDescripcion()}</td>
+                                        <td class="text-center">
+                                            <i class="fas fa-layer-group me-1"></i>
+                                            ${esp.getSeccionId()}
+                                        </td>
+                                        <td class="text-center">
+                                            <i class="fas fa-map-marker-alt me-1"></i>
+                                            ${esp.getUbicacionId()}
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge badge-${esp.getEstado().toLowerCase()}">
+                                                ${esp.getEstado()}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="btn btn-warning btn-icon" id="btned" 
+                                               href="EspacioServlet?action=editar&id=${esp.getId()}" 
+                                               title="Editar">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </a>
+                                            <a class="btn btn-danger btn-icon" id="btnq" 
+                                               href="EspacioServlet?action=eliminar&id=${esp.getId()}" 
+                                               onclick="return confirm('¿Estás seguro de que deseas eliminar este espacio?');"
+                                               title="Eliminar">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!--De JavaScript-->
-        <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>                        
-        <!--De bootstrap-->
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-        <!--Para paginacion de la tabla-->
-        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.js"></script>
+        <!-- Scripts -->
+        <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.js"></script>
 
         <!--De JS-->
         <script type="text/javascript">
