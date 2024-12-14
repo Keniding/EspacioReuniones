@@ -170,8 +170,7 @@ public class UsuarioServlet extends HttpServlet {
         int idUsuarioAEditar = Integer.parseInt(request.getParameter("id"));
 
         // Verificar si es el mismo usuario o tiene rol Superadministrador
-        if (
-                usuarioIdSesion == idUsuarioAEditar || "Superadministrador".equals(rolUsuario)) {
+        if (usuarioIdSesion == idUsuarioAEditar || "Superadministrador".equals(rolUsuario)) {
             listaUsuarios(request);
 
             UsuarioDAO usuarioDAO = new UsuarioDAO();
@@ -194,26 +193,7 @@ public class UsuarioServlet extends HttpServlet {
         Integer usuarioIdSesion = (Integer) session.getAttribute("usuarioId");
         String rolUsuario = (String) session.getAttribute("rol");
 
-        // Para usuarios no superadmin, usar el ID de la sesión
-        int idUsuarioAActualizar;
-        if (!"Superadministrador".equals(rolUsuario)) {
-            idUsuarioAActualizar = usuarioIdSesion; // Usar el ID de la sesión
-        } else {
-            // Para superadmin, obtener el ID del formulario
-            String idParam = request.getParameter("id");
-            if (idParam == null || idParam.trim().isEmpty()) {
-                request.setAttribute("error", "ID de usuario no válido");
-                response.sendRedirect("UsuarioServlet?action=listar");
-                return;
-            }
-            try {
-                idUsuarioAActualizar = Integer.parseInt(idParam);
-            } catch (NumberFormatException e) {
-                request.setAttribute("error", "ID de usuario no válido");
-                response.sendRedirect("UsuarioServlet?action=listar");
-                return;
-            }
-        }
+        int idUsuarioAActualizar = Integer.parseInt(request.getParameter("id"));
 
         // Verificar si es el mismo usuario o tiene rol Superadministrador
         if (usuarioIdSesion == idUsuarioAActualizar || "Superadministrador".equals(rolUsuario)) {
@@ -223,30 +203,11 @@ public class UsuarioServlet extends HttpServlet {
             String codigoAlumno = request.getParameter("txtCodigoAlumno");
             String email = request.getParameter("txtEmail");
             String password = request.getParameter("txtPassword");
+            String pass = PasswordUtil.hashPassword(password);
             String rol = request.getParameter("txtRol");
             String ubicacionId = request.getParameter("txtUbicacionId");
 
-            // Validar y establecer valores por defecto si es necesario
-            nombres = (nombres != null) ? nombres : "";
-            apellidos = (apellidos != null) ? apellidos : "";
-            dni = (dni != null) ? dni : "";
-            codigoAlumno = (codigoAlumno != null) ? codigoAlumno : "";
-            email = (email != null) ? email : "";
-
-            // Para usuarios no superadmin, mantener el rol y ubicación actuales
-            if (!"Superadministrador".equals(rolUsuario)) {
-                UsuarioDAO dao = new UsuarioDAO();
-                Usuario usuarioActual = dao.obtenerUsuarioPorId(idUsuarioAActualizar);
-                rol = usuarioActual.getRol();
-                ubicacionId = String.valueOf(usuarioActual.getUbicacionId());
-            }
-
-            int ubicacion;
-            try {
-                ubicacion = Integer.parseInt(ubicacionId);
-            } catch (NumberFormatException e) {
-                ubicacion = 0; // O un valor por defecto apropiado
-            }
+            int ubicacion = Integer.parseInt(ubicacionId);
 
             Usuario usuario = new Usuario();
             usuario.setId(idUsuarioAActualizar);
@@ -255,27 +216,18 @@ public class UsuarioServlet extends HttpServlet {
             usuario.setDni(dni);
             usuario.setCodigoAlumno(codigoAlumno);
             usuario.setEmail(email);
-
-            // Solo actualizar la contraseña si se proporciona una nueva
-            if (password != null && !password.trim().isEmpty()) {
-                usuario.setPassword(PasswordUtil.hashPassword(password));
-            }
-
+            usuario.setPassword(pass);
             usuario.setRol(rol);
             usuario.setUbicacionId(ubicacion);
 
             UsuarioDAO usuarioDAO = new UsuarioDAO();
             if (usuarioDAO.actualizarUsuario(usuario)) {
-                if ("Superadministrador".equals(rolUsuario)) {
-                    response.sendRedirect("UsuarioServlet?action=listar");
-                } else {
-                    // Para usuarios normales, redirigir a su perfil
-                    response.sendRedirect("UsuarioServlet?action=editar&id=" + idUsuarioAActualizar);
-                }
+                response.sendRedirect("UsuarioServlet?action=listar");
             } else {
                 response.sendRedirect("UsuarioServlet?action=editar&id=" + idUsuarioAActualizar);
             }
         } else {
+            // Si no tiene permisos, redirigir a la lista con un mensaje de error
             request.setAttribute("error", "No tiene permisos para actualizar este usuario");
             response.sendRedirect("UsuarioServlet?action=listar");
         }
