@@ -10,6 +10,14 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import model.Seccion;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 @WebServlet(name = "SeccionServlet", urlPatterns = {"/SeccionServlet"})
 public class SeccionServlet extends HttpServlet {
@@ -91,6 +99,9 @@ public class SeccionServlet extends HttpServlet {
                 break;
             case "eliminar":
                 eliminarSeccion(request, response);
+                break;
+            case "exportarExcel":
+                exportarExcel(request, response);
                 break;
             default:
                 listarSecciones(request, response);
@@ -183,6 +194,61 @@ public class SeccionServlet extends HttpServlet {
             response.sendRedirect("SeccionServlet?action=listar");
         } else {
             response.sendRedirect("SeccionServlet?action=eliminar&id=" + id);
+        }
+    }
+    
+    private void exportarExcel(HttpServletRequest request, HttpServletResponse response) 
+        throws ServletException, IOException {
+        try {
+            // Configurar la respuesta HTTP
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=Secciones.xlsx");
+
+            // Crear el libro de trabajo Excel
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            XSSFSheet sheet = workbook.createSheet("Secciones");
+
+            // Crear el estilo para los encabezados
+            XSSFCellStyle headerStyle = workbook.createCellStyle();
+            headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            headerStyle.setBorderBottom(BorderStyle.THIN);
+            headerStyle.setBorderTop(BorderStyle.THIN);
+            headerStyle.setBorderRight(BorderStyle.THIN);
+            headerStyle.setBorderLeft(BorderStyle.THIN);
+
+            // Crear la fila de encabezados
+            Row headerRow = sheet.createRow(0);
+            String[] columns = {"ID", "Nombre", "Descripción", "Ubicación ID"};
+
+            for (int i = 0; i < columns.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columns[i]);
+                cell.setCellStyle(headerStyle);
+                sheet.autoSizeColumn(i);
+            }
+
+            // Obtener los datos de secciones
+            SeccionDAO seccionDAO = new SeccionDAO();
+            List<Seccion> secciones = seccionDAO.listarSecciones();
+
+            // Llenar los datos
+            int rowNum = 1;
+            for (Seccion seccion : secciones) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(seccion.getId());
+                row.createCell(1).setCellValue(seccion.getNombre());
+                row.createCell(2).setCellValue(seccion.getDescripcion());
+                row.createCell(3).setCellValue(seccion.getUbicacionId());
+            }
+
+            // Escribir el libro de trabajo en la respuesta
+            workbook.write(response.getOutputStream());
+            workbook.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("SeccionServlet?action=listar&error=export");
         }
     }
 }

@@ -18,6 +18,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.Espacio;
 import controller.EspacioDAO;
 import jakarta.servlet.http.HttpSession;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class EspacioServlet extends HttpServlet {
 
@@ -98,6 +106,9 @@ public class EspacioServlet extends HttpServlet {
                 break;
             case "eliminar":
                 eliminarEspacio(request, response);
+                break;
+            case "exportarExcel":
+                exportarExcel(request, response);
                 break;
             default:
                 listarEspacios(request, response);
@@ -204,6 +215,65 @@ public class EspacioServlet extends HttpServlet {
             response.sendRedirect("EspacioServlet?action=listar");
         } else {
             response.sendRedirect("EspacioServlet?action=eliminar&id=" + id);
+        }
+    }
+
+    private void exportarExcel(HttpServletRequest request, HttpServletResponse response) 
+        throws ServletException, IOException {
+        try {
+            // Configurar la respuesta HTTP
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=Espacios.xlsx");
+
+            // Crear el libro de trabajo Excel
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            XSSFSheet sheet = workbook.createSheet("Espacios");
+
+            // Crear el estilo para los encabezados
+            XSSFCellStyle headerStyle = workbook.createCellStyle();
+            headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            headerStyle.setBorderBottom(BorderStyle.THIN);
+            headerStyle.setBorderTop(BorderStyle.THIN);
+            headerStyle.setBorderRight(BorderStyle.THIN);
+            headerStyle.setBorderLeft(BorderStyle.THIN);
+
+            // Crear la fila de encabezados
+            Row headerRow = sheet.createRow(0);
+            String[] columns = {"ID", "Nombre", "Capacidad", "Descripción", 
+                              "Sección ID", "Ubicación ID", "Estado"};
+
+            for (int i = 0; i < columns.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columns[i]);
+                cell.setCellStyle(headerStyle);
+                sheet.autoSizeColumn(i);
+            }
+
+            // Obtener los datos de espacios
+            EspacioDAO espacioDAO = new EspacioDAO();
+            List<Espacio> espacios = espacioDAO.listarEspacios();
+
+            // Llenar los datos
+            int rowNum = 1;
+            for (Espacio espacio : espacios) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(espacio.getId());
+                row.createCell(1).setCellValue(espacio.getNombre());
+                row.createCell(2).setCellValue(espacio.getCapacidad());
+                row.createCell(3).setCellValue(espacio.getDescripcion());
+                row.createCell(4).setCellValue(espacio.getSeccionId());
+                row.createCell(5).setCellValue(espacio.getUbicacionId());
+                row.createCell(6).setCellValue(espacio.getEstado());
+            }
+
+            // Escribir el libro de trabajo en la respuesta
+            workbook.write(response.getOutputStream());
+            workbook.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("EspacioServlet?action=listar&error=export");
         }
     }
 }

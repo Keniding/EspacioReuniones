@@ -11,6 +11,14 @@ import jakarta.servlet.http.HttpSession;
 import model.Reserva;
 import controller.ReservaDAO;
 import java.util.List;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ReservaServlet extends HttpServlet {
 
@@ -91,6 +99,9 @@ public class ReservaServlet extends HttpServlet {
                 break;
             case "eliminar":
                 eliminarReserva(request, response);
+                break;
+            case "exportarExcel":
+                exportarExcel(request, response);
                 break;
             default:
                 listarReservas(request, response);
@@ -202,5 +213,66 @@ public class ReservaServlet extends HttpServlet {
         // Por ejemplo, sumando una hora a la hora de inicio
         long millis = horaInicio.getTime() + 3600000; // 1 hora en milisegundos
         return new Time(millis);
+    }
+    
+    private void exportarExcel(HttpServletRequest request, HttpServletResponse response) 
+        throws ServletException, IOException {
+        try {
+            // Configurar la respuesta HTTP
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=Reservas.xlsx");
+
+            // Crear el libro de trabajo Excel
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            XSSFSheet sheet = workbook.createSheet("Reservas");
+
+            // Crear el estilo para los encabezados
+            XSSFCellStyle headerStyle = workbook.createCellStyle();
+            headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            headerStyle.setBorderBottom(BorderStyle.THIN);
+            headerStyle.setBorderTop(BorderStyle.THIN);
+            headerStyle.setBorderRight(BorderStyle.THIN);
+            headerStyle.setBorderLeft(BorderStyle.THIN);
+
+            // Crear la fila de encabezados
+            Row headerRow = sheet.createRow(0);
+            String[] columns = {"ID", "Usuario ID", "Espacio ID", "Fecha", "Hora Inicio", 
+                              "Hora Fin", "Estado"};
+
+            for (int i = 0; i < columns.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columns[i]);
+                cell.setCellStyle(headerStyle);
+                sheet.autoSizeColumn(i);
+            }
+
+            // Obtener los datos de reservas
+            ReservaDAO reservaDAO = new ReservaDAO();
+            HttpSession session = request.getSession();
+            Integer usuarioId = (Integer) session.getAttribute("usuarioId");
+            List<Reserva> reservas = reservaDAO.listarReservas(usuarioId);
+
+            // Llenar los datos
+            int rowNum = 1;
+            for (Reserva reserva : reservas) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(reserva.getId());
+                row.createCell(1).setCellValue(reserva.getUsuarioId());
+                row.createCell(2).setCellValue(reserva.getEspacioId());
+                row.createCell(3).setCellValue(reserva.getFecha().toString());
+                row.createCell(4).setCellValue(reserva.getHoraInicio().toString());
+                row.createCell(5).setCellValue(reserva.getHoraFin().toString());
+                row.createCell(6).setCellValue(reserva.getEstado());
+            }
+
+            // Escribir el libro de trabajo en la respuesta
+            workbook.write(response.getOutputStream());
+            workbook.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("ReservaServlet?action=listar&error=export");
+        }
     }
 }

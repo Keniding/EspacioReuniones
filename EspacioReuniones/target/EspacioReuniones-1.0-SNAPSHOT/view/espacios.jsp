@@ -152,6 +152,11 @@
             <a href="EspacioServlet?action=nuevo" class="btn btn-add">
                 <i class="fas fa-plus"></i>Agregar Espacio
             </a>
+            
+            <a href="EspacioServlet?action=exportarExcel" class="btn btn-success mb-4">
+                <i class="fas fa-file-excel me-2"></i>
+                Exportar a Excel
+            </a>
         </div>
         
         <c:if test="${empty espacios}">

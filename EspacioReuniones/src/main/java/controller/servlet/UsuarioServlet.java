@@ -10,6 +10,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.Usuario;
 import controller.UsuarioDAO;
 import jakarta.servlet.http.HttpSession;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
 
 public class UsuarioServlet extends HttpServlet {
 
@@ -108,11 +116,75 @@ public class UsuarioServlet extends HttpServlet {
             case "actualizarPerfil":
                 actualizarPerfil(request, response);
                 break;
+            case "exportarExcel":
+                exportarExcel(request, response);
+                break;
             default:
                 listarUsuarios(request, response);
                 break;
         }
     }
+    
+    private void exportarExcel(HttpServletRequest request, HttpServletResponse response) 
+        throws ServletException, IOException {
+        try {
+            // Configurar la respuesta HTTP
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Content-Disposition", "attachment; filename=Usuarios.xlsx");
+
+            // Crear el libro de trabajo Excel
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            XSSFSheet sheet = workbook.createSheet("Usuarios");
+
+            // Crear el estilo para los encabezados
+            XSSFCellStyle headerStyle = workbook.createCellStyle();
+            headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            headerStyle.setBorderBottom(BorderStyle.THIN);
+            headerStyle.setBorderTop(BorderStyle.THIN);
+            headerStyle.setBorderRight(BorderStyle.THIN);
+            headerStyle.setBorderLeft(BorderStyle.THIN);
+
+            // Crear la fila de encabezados
+            Row headerRow = sheet.createRow(0);
+            String[] columns = {"ID", "Nombres", "Apellidos", "DNI", "Código Alumno", 
+                               "Email", "Rol", "Ubicación"};
+
+            for (int i = 0; i < columns.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columns[i]);
+                cell.setCellStyle(headerStyle);
+                sheet.autoSizeColumn(i);
+            }
+
+            // Obtener los datos de usuarios
+            UsuarioDAO usuarioDAO = new UsuarioDAO();
+            List<Usuario> usuarios = usuarioDAO.listarUsuarios();
+
+            // Llenar los datos
+            int rowNum = 1;
+            for (Usuario usuario : usuarios) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(usuario.getId());
+                row.createCell(1).setCellValue(usuario.getNombres());
+                row.createCell(2).setCellValue(usuario.getApellidos());
+                row.createCell(3).setCellValue(usuario.getDni());
+                row.createCell(4).setCellValue(usuario.getCodigoAlumno());
+                row.createCell(5).setCellValue(usuario.getEmail());
+                row.createCell(6).setCellValue(usuario.getRol());
+                row.createCell(7).setCellValue(usuario.getUbicacionId());
+            }
+
+            // Escribir el libro de trabajo en la respuesta
+            workbook.write(response.getOutputStream());
+            workbook.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("UsuarioServlet?action=listar&error=export");
+        }
+    }
+
 
     private void listaUsuarios(HttpServletRequest request) {
         UsuarioDAO usuarioDAO = new UsuarioDAO();

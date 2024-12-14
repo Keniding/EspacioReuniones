@@ -152,6 +152,10 @@
             <i class="fas fa-plus me-2"></i>
             Agregar Reserva
         </a>
+        <a href="ReservaServlet?action=exportarExcel" class="btn btn-success mb-4">
+            <i class="fas fa-file-excel me-2"></i>
+            Exportar a Excel
+        </a>
         
         <c:if test="${empty reservas}">
             <div class="alert alert-info" role="alert">

@@ -157,6 +157,10 @@
                         <i class="fas fa-plus me-2"></i>
                         Agregar Nueva Ubicación
                     </a>
+                    <a href="UbicacionServlet?action=exportarExcel" class="btn btn-success">
+                        <i class="fas fa-file-excel me-2"></i>
+                        Exportar a Excel
+                    </a>
                 </div>
             </div>
             <div class="card-body">

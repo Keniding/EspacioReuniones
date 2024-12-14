@@ -9,6 +9,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.Ubicacion;
 import controller.UbicacionDAO;
 import jakarta.servlet.http.HttpSession;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class UbicacionServlet extends HttpServlet {
 
@@ -91,6 +99,9 @@ public class UbicacionServlet extends HttpServlet {
             case "eliminar":
                 eliminarUbicacion(request, response);
                 break;
+            case "exportarExcel":
+                exportarExcel(request, response);
+                break;
             default:
                 listarUbicaciones(request, response);
                 break;
@@ -154,26 +165,6 @@ public class UbicacionServlet extends HttpServlet {
         request.getRequestDispatcher("/view/main.jsp").forward(request, response);
     }
 
-    private void actualizarUbicacion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-
-        String nombre = request.getParameter("txtNombre");
-        String direccion = request.getParameter("txtDireccion");
-
-        Ubicacion ubicacion = new Ubicacion();
-        ubicacion.setId(id);
-        ubicacion.setNombre(nombre);
-        ubicacion.setDireccion(direccion);
-
-        UbicacionDAO ubicacionDAO = new UbicacionDAO();
-        if (ubicacionDAO.actualizarUbicacion(ubicacion)) {
-            // Redirige a la lista de ubicaciones después de actualizar
-            response.sendRedirect("UbicacionServlet?action=listar");
-        } else {
-            // Maneja el error si no se pudo actualizar
-            response.sendRedirect("UbicacionServlet?action=editar&id=" + id);
-        }
-    }
 
     private void eliminarUbicacion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
@@ -187,4 +178,78 @@ public class UbicacionServlet extends HttpServlet {
             response.sendRedirect("UbicacionServlet?action=eliminar&id=" + id);
         }
     }
+    
+        private void actualizarUbicacion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+
+        String nombre = request.getParameter("txtNombre");
+        String direccion = request.getParameter("txtDireccion");
+
+        Ubicacion ubicacion = new Ubicacion();
+        ubicacion.setId(id);
+        ubicacion.setNombre(nombre);
+        ubicacion.setDireccion(direccion);
+
+        UbicacionDAO ubicacionDAO = new UbicacionDAO();
+        if (ubicacionDAO.actualizarUbicacion(ubicacion)) {
+            response.sendRedirect("UbicacionServlet?action=listar");
+        } else {
+            response.sendRedirect("UbicacionServlet?action=editar&id=" + id);
+        }
+    }
+
+    private void exportarExcel(HttpServletRequest request, HttpServletResponse response) 
+        throws ServletException, IOException {
+        try {
+            // Configurar la respuesta HTTP
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=Ubicaciones.xlsx");
+
+            // Crear el libro de trabajo Excel
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            XSSFSheet sheet = workbook.createSheet("Ubicaciones");
+
+            // Crear el estilo para los encabezados
+            XSSFCellStyle headerStyle = workbook.createCellStyle();
+            headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            headerStyle.setBorderBottom(BorderStyle.THIN);
+            headerStyle.setBorderTop(BorderStyle.THIN);
+            headerStyle.setBorderRight(BorderStyle.THIN);
+            headerStyle.setBorderLeft(BorderStyle.THIN);
+
+            // Crear la fila de encabezados
+            Row headerRow = sheet.createRow(0);
+            String[] columns = {"ID", "Nombre", "Dirección"};
+
+            for (int i = 0; i < columns.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columns[i]);
+                cell.setCellStyle(headerStyle);
+                sheet.autoSizeColumn(i);
+            }
+
+            // Obtener los datos de ubicaciones
+            UbicacionDAO ubicacionDAO = new UbicacionDAO();
+            List<Ubicacion> ubicaciones = ubicacionDAO.listarUbicaciones();
+
+            // Llenar los datos
+            int rowNum = 1;
+            for (Ubicacion ubicacion : ubicaciones) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(ubicacion.getId());
+                row.createCell(1).setCellValue(ubicacion.getNombre());
+                row.createCell(2).setCellValue(ubicacion.getDireccion());
+            }
+
+            // Escribir el libro de trabajo en la respuesta
+            workbook.write(response.getOutputStream());
+            workbook.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("UbicacionServlet?action=listar&error=export");
+        }
+    }
 }
+

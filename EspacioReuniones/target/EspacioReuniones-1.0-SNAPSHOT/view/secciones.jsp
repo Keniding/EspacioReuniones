@@ -215,6 +215,11 @@
         <h2>Lista de Secciones</h2>
         
         <a href="SeccionServlet?action=nuevo" class="btn btn-primary mb-4">Agregar Sección</a>
+      
+        <a href="SeccionServlet?action=exportarExcel" class="btn btn-success mb-4">
+            <i class="fas fa-file-excel me-2"></i>
+            Exportar a Excel
+        </a>
         
         <c:if test="${empty secciones}">
             <p class="text-muted">No se encontraron secciones.</p>
